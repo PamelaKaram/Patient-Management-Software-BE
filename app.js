@@ -12,8 +12,8 @@ app.get('/', (req, res) => res.send('Hello World!'));
 
 /*-------------Doctors apis---------------- */
 // api to get all the appointments and help the doctor check his availability
-app.get('/doctor/check',(req,res)=>{
-    let sql= 'SELECT appointments.*, users.first_name, users.last_name FROM appointments INNER JOIN users ON appointments.user_id = users.id';
+app.get('/doctor/check',async(req,res)=>{
+    let sql= await 'SELECT appointments.*, users.first_name, users.last_name FROM appointments INNER JOIN users ON appointments.user_id = users.id';
     connection.query(sql, (err, result)=>{
         if(err) throw err;
         console.log(result);
@@ -23,10 +23,10 @@ app.get('/doctor/check',(req,res)=>{
 })
 
 // api to get all the appointments before a specific date
-app.get('/doctor/checkPrevious', (req, res)=>{
+app.get('/doctor/checkPrevious', async(req, res)=>{
     const today = new Date();
     const dateString = today.toISOString().slice(0,10);
-    let sql = `SELECT appointments.*, users.first_name, users.last_name FROM appointments INNER JOIN users ON appointments.user_id = users.id WHERE appointments.date < '${dateString}'`;
+    let sql = await `SELECT appointments.*, users.first_name, users.last_name FROM appointments INNER JOIN users ON appointments.user_id = users.id WHERE appointments.date < '${dateString}'`;
     connection.query(sql, (err, result)=>{
         if(err) throw err;
         console.log(result);
@@ -36,10 +36,10 @@ app.get('/doctor/checkPrevious', (req, res)=>{
 })
 
 // api to get all the appointments after a specific date
-app.get('/doctor/checkFuture', (req, res)=>{
+app.get('/doctor/checkFuture',async (req, res)=>{
     const today = new Date();
     const dateString = today.toISOString().slice(0,10);
-    let sql = `SELECT appointments.*, users.first_name, users.last_name FROM appointments INNER JOIN users ON appointments.user_id = users.id WHERE appointments.date > '${dateString}'`;
+    let sql = await `SELECT appointments.*, users.first_name, users.last_name FROM appointments INNER JOIN users ON appointments.user_id = users.id WHERE appointments.date > '${dateString}'`;
     connection.query(sql, (err, result)=>{
         if(err) throw err;
         console.log(result);

@@ -51,7 +51,7 @@ app.get('/doctor/checkFuture',async (req, res)=>{
 
 /*-------------Patient apis---------------- */
 // api to get all the previous appointments of a specific patient
-app.post('/patient/checkPrevious',async (req, res)=>{
+app.get('/patient/checkPrevious',async (req, res)=>{
     const today = new Date();
     const dateString = today.toISOString().slice(0,10);
     const email = req.body.email;
@@ -66,7 +66,7 @@ app.post('/patient/checkPrevious',async (req, res)=>{
 })
 
 // api to get all the future appointments of a specific patient
-app.post('/patient/checkFuture',async (req, res)=>{
+app.get('/patient/checkFuture',async (req, res)=>{
     const today = new Date();
     const dateString = today.toISOString().slice(0,10);
     const email = req.body.email;

@@ -1,0 +1,24 @@
+version: '3'
+services:
+  app:
+    build: .
+    volumes:
+      - .:/usr/src/app
+    image: pms-be
+    restart: always
+    ports:
+      - 8080:8080
+    command: bash -c ./start.sh
+    env_file: .env
+  mysql:
+    image: mysql:latest
+    volumes:
+      - pms-mysql-data:/var/lib/mysql
+    ports:
+      - 3366:3306
+    environment: 
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: patient_software
+
+volumes:
+  pms-mysql-data:

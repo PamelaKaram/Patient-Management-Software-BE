@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
 
 const port = 3000;
 const connection = require('./database');
@@ -13,7 +14,28 @@ app.get('/', (req, res) => res.send('Hello World!'));
 /*------------------------------------------------------------------------------------------------*/
 /*-----------------------------------Apis for all users-------------------------------------------*/
 
-app.post('/resetPassword', async (req, res)=>{})
+//api that will allow any registered email to reset their password 
+app.post('/resetPassword', async (req, res)=>{
+    const email = req.body.email;
+    const password = req.body.password;
+    const confirm_password = req.body.confirm_password;
+
+    if(password !== confirm_password){
+        // checking if passwords match
+        res.send('Passwords do not match');
+    }
+    else{
+        // hashing the password
+        const hashedPassword = bcrypt.hashSync(password,10);
+        let sql = await `UPDATE users SET password = '${hashedPassword}' WHERE email = '${email}'`;
+        connection.query(sql, (err, result)=>{
+            if(err) throw err;
+            console.log(result);
+            res.json(result);
+            res.send('Data fetched...');
+        })
+    }
+})
 /*------------------------------------------------------------------------------------------------*/
 
 

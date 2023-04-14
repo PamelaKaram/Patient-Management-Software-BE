@@ -10,6 +10,13 @@ app.use(bodyParser.json());
 
 app.get('/', (req, res) => res.send('Hello World!'));
 
+/*------------------------------------------------------------------------------------------------*/
+/*-----------------------------------Apis for all users-------------------------------------------*/
+
+app.post('/resetPassword', async (req, res)=>{})
+/*------------------------------------------------------------------------------------------------*/
+
+
 /*-------------Doctors apis---------------- */
 // api to get all the appointments and help the doctor check his availability
 app.get('/doctor/check',async(req,res)=>{

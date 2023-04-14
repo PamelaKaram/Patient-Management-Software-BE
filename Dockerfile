@@ -19,4 +19,4 @@ COPY . .
 
 EXPOSE 8080
 
-CMD ./start.sh
+CMD ["npm", "run", "start"]

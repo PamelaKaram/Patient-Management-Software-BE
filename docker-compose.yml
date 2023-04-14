@@ -4,16 +4,16 @@ services:
     build: .
     volumes:
       - .:/usr/src/app
-    image: pms-be
+    image: pms/be
     restart: always
     ports:
       - 8080:8080
-    command: bash -c ./start.sh
+    command: bash -c "npm run start"
     env_file: .env
   mysql:
     image: mysql:latest
     volumes:
-      - pms-mysql-data:/var/lib/mysql
+      - pms-mysql:/var/lib/mysql
     ports:
       - 3366:3306
     environment: 
@@ -21,4 +21,4 @@ services:
       MYSQL_DATABASE: patient_software
 
 volumes:
-  pms-mysql-data:
+  pms-mysql:

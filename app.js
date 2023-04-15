@@ -22,19 +22,31 @@ app.post('/resetPassword', async (req, res)=>{
 
     if(password !== confirm_password){
         // checking if passwords match
-        res.send('Passwords do not match');
+        return res.status(400).json({error: 'Passwords do not match'});
     }
-    else{
-        // hashing the password
-        const hashedPassword = bcrypt.hashSync(password,10);
-        let sql = await `UPDATE users SET password = '${hashedPassword}' WHERE email = '${email}'`;
-        connection.query(sql, (err, result)=>{
-            if(err) throw err;
-            console.log(result);
-            res.json(result);
-            res.send('Data fetched...');
-        })
-    }
+
+    try{
+        const [rows] = connection.query('SELECT * FROM users WHERE email=?', [email]);
+        if(rows.length === 0){
+            // checking if the email exists
+            return res.status(400).json({error: 'Email does not exist'});
+        }
+        else{
+            // hashing the password
+            const hashedPassword = bcrypt.hashSync(password,10);
+            const sql = 'UPDATE users SET password = ? WHERE email = ?';
+            const values = [hashedPassword, email];
+            connection.query(sql, values,(error, result)=>{
+                if (error){
+                    return res.status(500).json({error: "Unable to update the password"});
+                }
+                return res.status(200).json({message: "Password updated successfully"});
+            });
+        }
+
+    }catch(error){
+        return res.status(500).json({error: "Unable to update the password"});
+    } 
 })
 /*------------------------------------------------------------------------------------------------*/
 

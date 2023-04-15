@@ -1,24 +1,28 @@
 version: '3'
 services:
   app:
-    build: .
+    build:
+      context: .
     volumes:
       - .:/usr/src/app
-    image: pms/be
+    container_name: patient-management-software-be
     restart: always
     ports:
       - 8080:8080
-    command: bash -c "npm run start"
+    command: bash -c "npm run dev"
     env_file: .env
+    depends_on:
+      - mysql
   mysql:
-    image: mysql:latest
+    image: mysql
     volumes:
-      - pms-mysql:/var/lib/mysql
+      - pms-mysql.1:/var/lib/mysql
     ports:
       - 3366:3306
     environment: 
+      MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: patient_software
 
 volumes:
-  pms-mysql:
+  pms-mysql.1:

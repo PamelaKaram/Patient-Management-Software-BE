@@ -1,11 +1,11 @@
 import express from "express";
-import db from "./database.js";
+import sequelize from "./models/index.js";
 import { signupValidation, loginValidation, ROLES } from "./validation.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import authenticated from "./middlewares/authentication.js";
-import * as dotenv from "dotenv";
 import isAuthorized from "./middlewares/authorization.js";
+import * as dotenv from "dotenv";
 dotenv.config();
 
 const router = express.Router();
@@ -16,22 +16,26 @@ router.post("/register", signupValidation, async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
   console.log(req.body);
   try {
-    const getUser = await db.query(
-      `SELECT * FROM users WHERE LOWER(email) = LOWER(${db.escape(email)});`
+    const getUser = await sequelize.query(
+      `SELECT * FROM users WHERE LOWER(email) = LOWER(${sequelize.escape(
+        email
+      )});`
     );
-    if (getUser.length > 0) {
+    if (getUser[0].length > 0) {
       return res.status(409).send({
         msg: "Email already in use!",
       });
     }
     const hash = await bcrypt.hash(password, 10);
-    await db.query(
-      `INSERT INTO users (email, password, firstName, lastName) VALUES (${db.escape(
+    await sequelize.query(
+      `INSERT INTO users (email, password, firstName, lastName) VALUES (${sequelize.escape(
         email
-      )}, ${db.escape(hash)}, ${db.escape(firstName)}, ${db.escape(lastName)})`
+      )}, ${sequelize.escape(hash)}, ${sequelize.escape(
+        firstName
+      )}, ${sequelize.escape(lastName)})`
     );
     return res.status(201).send({
-      msg: "The user has been registerd",
+      msg: "The user has been registered",
     });
   } catch (e) {
     console.log(e);
@@ -44,8 +48,10 @@ router.post("/register", signupValidation, async (req, res) => {
 router.post("/login", loginValidation, async (req, res) => {
   const { email, password } = req.body;
   try {
-    const getUser = await db.query(
-      `SELECT * FROM users WHERE LOWER(email) = LOWER(${db.escape(email)});`
+    const getUser = await sequelize.query(
+      `SELECT * FROM users WHERE LOWER(email) = LOWER(${sequelize.escape(
+        email
+      )});`
     );
     if (getUser.length === 0) {
       return res.status(409).send({
@@ -104,8 +110,8 @@ router.post("/token", async (req, res) => {
 
 router.get("/user", authenticated, async (req, res) => {
   try {
-    const getUser = await db.query(
-      `SELECT * FROM users WHERE id = ${db.escape(req.user.id)};`
+    const getUser = await sequelize.query(
+      `SELECT * FROM users WHERE id = ${sequelize.escape(req.user.id)};`
     );
     return res.status(200).send({
       user: getUser[0],

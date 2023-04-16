@@ -67,7 +67,7 @@ app.get('/doctor/check',async(req,res)=>{
 app.get('/doctor/checkPrevious', async(req, res)=>{
     const today = new Date();
     const dateString = today.toISOString().slice(0,10);
-    const sql = 'SELECT appointments.*, users.first_name, users.last_name FROM appointments INNER JOIN users ON appointments.user_id = users.id WHERE appointments.date < ?';
+    const sql = await 'SELECT appointments.*, users.first_name, users.last_name FROM appointments INNER JOIN users ON appointments.user_id = users.id WHERE appointments.date < ?';
     
     try{
         connection.query(sql, dateString, (err, result)=>{

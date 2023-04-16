@@ -142,6 +142,25 @@ app.get('/patient/checkFuture',async (req, res)=>{
 /*----------------------------------------- */
 
 /*-------------Pharmacy apis---------------- */
+// api to retrieve a patient's medical prescription
+app.get('/pharmacy/check',async (req, res)=>{
+    const email = req.body.email;
+    const sql = 'SELECT medical_prescriptions.*, users.email FROM users, medical_prescriptions WHERE medical_prescriptions.user_id = users.id AND users.email = ?';
+
+    try{
+        connection.query(sql, email, (err, result)=>{
+            if(err){
+                return res.status(500).json({err:"Unable to retrieve"});
+            }
+            else{
+                return res.status(200).json({result});
+            }
+        })
+
+    }catch(err){
+        return res.status(500).json({err:"Unable to retrieve"});
+    }
+})
 /*------------------------------------------ */
 
 app.listen(port, () => console.log(`Express app running on port ${port}!`));

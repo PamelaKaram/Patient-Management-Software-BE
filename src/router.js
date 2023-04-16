@@ -10,10 +10,10 @@ dotenv.config();
 
 const router = express.Router();
 
-router.post("/register", signupValidation, async (req, res) => {
+router.post("/registerPatient", signupValidation, async (req, res) => {
   // LOWER() for lower case
   // escape() method sanitizes the input to prevent SQL injection
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, birthday, phoneNumber } = req.body;
   console.log(req.body);
   try {
     const getUser = await sequelize.query(
@@ -26,13 +26,16 @@ router.post("/register", signupValidation, async (req, res) => {
         msg: "Email already in use!",
       });
     }
+    const password = generateRandomPassword(8);
     const hash = await bcrypt.hash(password, 10);
     await sequelize.query(
-      `INSERT INTO users (email, password, firstName, lastName) VALUES (${sequelize.escape(
+      `INSERT INTO users (email, lastName, firstName, phoneNumber, birthday, password, role) VALUES (${sequelize.escape(
         email
-      )}, ${sequelize.escape(hash)}, ${sequelize.escape(
+      )}, ${sequelize.escape(lastName)}, ${sequelize.escape(
         firstName
-      )}, ${sequelize.escape(lastName)})`
+      )}, ${sequelize.escape(phoneNumber)}, ${sequelize.escape(
+        birthday
+      )}, ${sequelize.escape(password)}, ${sequelize.escape(ROLES.PATIENT)});`
     );
     return res.status(201).send({
       msg: "The user has been registered",
@@ -44,6 +47,25 @@ router.post("/register", signupValidation, async (req, res) => {
     });
   }
 });
+
+const generateRandomPassword = (length) => {
+  const chars =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_+";
+
+  let password = "";
+
+  for (let i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+
+  return password;
+};
+
+const ROLES = {
+  PATIEMT: "patient",
+  DOCTOR: "doctor",
+  PHARMACY: "pharmacy",
+};
 
 router.post("/login", loginValidation, async (req, res) => {
   const { email, password } = req.body;

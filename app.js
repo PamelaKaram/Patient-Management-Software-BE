@@ -53,14 +53,22 @@ app.post('/resetPassword', async (req, res)=>{
 
 /*-------------Doctors apis---------------- */
 // api to get all the appointments and help the doctor check his availability
-app.get('/doctor/check',async(req,res)=>{
-    let sql= await 'SELECT appointments.*, users.first_name, users.last_name FROM appointments INNER JOIN users ON appointments.user_id = users.id';
-    connection.query(sql, (err, result)=>{
-        if(err) throw err;
-        console.log(result);
-        res.json(result);
-        res.send('Data fetched...');
-    })
+
+app.get('/doctor/check', async(req, res)=>{
+    const sql= await 'SELECT appointments.*, users.first_name, users.last_name FROM appointments INNER JOIN users ON appointments.user_id = users.id';
+
+    try{
+        connection.query(sql, (err, result)=>{
+            if(err){
+                return res.status(500).json({err:"Unable to retrieve"});
+            }
+            else{
+                return res.status(200).json({result});
+            }
+        })
+    }catch(err){
+        return res.status(500).json({err:"Unable to retrieve"});
+    }
 })
 
 // api to get all the appointments before a specific date

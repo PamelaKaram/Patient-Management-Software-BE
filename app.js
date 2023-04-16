@@ -84,16 +84,23 @@ app.get('/doctor/checkPrevious', async(req, res)=>{
 })
 
 // api to get all the appointments after a specific date
-app.get('/doctor/checkFuture',async (req, res)=>{
+app.get('/doctor/checkFuture', async(req, res)=>{
     const today = new Date();
     const dateString = today.toISOString().slice(0,10);
-    let sql = await `SELECT appointments.*, users.first_name, users.last_name FROM appointments INNER JOIN users ON appointments.user_id = users.id WHERE appointments.date > '${dateString}'`;
-    connection.query(sql, (err, result)=>{
-        if(err) throw err;
-        console.log(result);
-        res.json(result);
-        res.send('Data fetched...');
-    })
+    const sql = 'SELECT appointments.*, users.first_name, users.last_name FROM appointments INNER JOIN users ON appointments.user_id = users.id WHERE appointments.date > ?';
+    
+    try{
+        connection.query(sql, dateString, (err, result)=>{
+            if(err){
+                return res.status(500).json({err:"Unable to retrieve"});
+            }
+            else{
+                return res.status(200).json({result});
+            }
+        })
+    }catch(err){
+        return res.status(500).json({err:"Unable to retrieve"});
+    }
 })
 /*----------------------------------------- */
 

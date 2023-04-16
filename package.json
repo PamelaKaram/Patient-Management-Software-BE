@@ -28,7 +28,9 @@
     "express-validator": "^7.0.0",
     "jsonwebtoken": "^9.0.0",
     "mysql2": "^3.2.0",
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "sequelize": "^6.31.0",
+    "sequelize-cli": "^6.6.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",

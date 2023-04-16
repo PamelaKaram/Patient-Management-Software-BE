@@ -24,7 +24,8 @@ app.use(cors());
 
 app.use("/api", router); //add versioning
 
-app.use((err, req, res) => {
+app.use((err, res) => {
+  console.log(err);
   err.statusCode = err.statusCode || 500;
   err.message = err.message || "Internal Server Error";
   res.status(err.statusCode).json({

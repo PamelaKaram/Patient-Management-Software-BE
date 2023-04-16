@@ -41,3 +41,41 @@ router.post("/register", signupValidation, async (req, res) => {
   }
 });
 
+router.post("/login", loginValidation, async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const getUser = await db.query(
+      `SELECT * FROM users WHERE LOWER(email) = LOWER(${db.escape(email)});`
+    );
+    if (getUser.length === 0) {
+      return res.status(409).send({
+        msg: "Email or password is incorrect",
+      });
+    }
+    const match = await bcrypt.compare(password, getUser[0].password);
+    if (!match) {
+      return res.status(409).send({
+        msg: "Email or password is incorrect",
+      });
+    }
+    const user = {
+      id: getUser[0].id,
+      role: ROLES.PATIENT,
+    };
+    const accessToken = jwt.sign(user, process.env.JWT_ACCESS_TOKEN, {
+      expiresIn: "15min",
+    });
+    const refreshToken = jwt.sign(user, process.env.JWT_REFRESH_TOKEN);
+    return res.status(200).send({
+      accessToken,
+      refreshToken,
+      user: getUser[0],
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).send({
+      msg: err,
+    });
+  }
+});
+

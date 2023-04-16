@@ -79,3 +79,47 @@ router.post("/login", loginValidation, async (req, res) => {
   }
 });
 
+router.post("/token", async (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) return res.sendStatus(401);
+  try {
+    const decode = await jwt.verify(
+      refreshToken,
+      process.env.JWT_REFRESH_TOKEN
+    );
+    const user = {
+      id: decode.id,
+      role: decode.role,
+    };
+    const accessToken = jwt.sign(user, process.env.JWT_ACCESS_TOKEN, {
+      expiresIn: "15min",
+    });
+    return res.status(200).send({
+      accessToken,
+    });
+  } catch (e) {
+    return res.sendStatus(403);
+  }
+});
+
+router.get("/user", authenticated, async (req, res) => {
+  try {
+    const getUser = await db.query(
+      `SELECT * FROM users WHERE id = ${db.escape(req.user.id)};`
+    );
+    return res.status(200).send({
+      user: getUser[0],
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).send({
+      msg: e,
+    });
+  }
+});
+
+router.get("/admin", authenticated, isAuthorized(ROLES.admin), (req, res) => {
+  res.send("Admin page");
+});
+
+export default router;

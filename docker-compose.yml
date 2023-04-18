@@ -34,3 +34,5 @@ services:
 
 volumes:
   pms-mysql.1:
+  typesense-data:
+    driver: local

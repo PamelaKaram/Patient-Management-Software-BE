@@ -5,6 +5,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import authenticated from "./middlewares/authentication.js";
 import isAuthorized from "./middlewares/authorization.js";
+import client from "../config/typesense.js";
+
 import * as dotenv from "dotenv";
 dotenv.config();
 
@@ -13,7 +15,15 @@ const router = express.Router();
 router.post("/registerPatient", signupValidation, async (req, res) => {
   // LOWER() for lower case
   // escape() method sanitizes the input to prevent SQL injection
-  const { firstName, lastName, email, birthday, phoneNumber } = req.body;
+  const {
+    firstName,
+    lastName,
+    email,
+    birthday,
+    phoneNumber,
+    createdAt,
+    updatedAt,
+  } = req.body;
   console.log(req.body);
   try {
     const getUser = await sequelize.query(
@@ -29,13 +39,15 @@ router.post("/registerPatient", signupValidation, async (req, res) => {
     const password = generateRandomPassword(8);
     const hash = await bcrypt.hash(password, 10);
     await sequelize.query(
-      `INSERT INTO users (email, lastName, firstName, phoneNumber, birthday, password, role) VALUES (${sequelize.escape(
+      `INSERT INTO users (email, lastName, firstName, phoneNumber, birthday, password, role, createdAt, updatedAt) VALUES (${sequelize.escape(
         email
       )}, ${sequelize.escape(lastName)}, ${sequelize.escape(
         firstName
       )}, ${sequelize.escape(phoneNumber)}, ${sequelize.escape(
         birthday
-      )}, ${sequelize.escape(password)}, ${sequelize.escape(ROLES.PATIENT)});`
+      )}, ${sequelize.escape(password)}, ${sequelize.escape(
+        ROLES.PATIENT
+      )}, ${sequelize.escape(createdAt)}, ${sequelize.escape(updatedAt)});`
     );
     return res.status(201).send({
       msg: "The user has been registered",
@@ -59,12 +71,6 @@ const generateRandomPassword = (length) => {
   }
 
   return password;
-};
-
-const ROLES = {
-  PATIEMT: "patient",
-  DOCTOR: "doctor",
-  PHARMACY: "pharmacy",
 };
 
 router.post("/login", loginValidation, async (req, res) => {
@@ -144,6 +150,21 @@ router.get("/user", authenticated, async (req, res) => {
       msg: e,
     });
   }
+});
+
+router.get("/users", async (req, res) => {
+  let searchParameters = {
+    q: "j",
+    query_by: "firstName",
+  };
+
+  client
+    .collections("users")
+    .documents()
+    .search(searchParameters)
+    .then(function (searchResults) {
+      console.log(searchResults);
+    });
 });
 
 router.get("/admin", authenticated, isAuthorized(ROLES.admin), (req, res) => {

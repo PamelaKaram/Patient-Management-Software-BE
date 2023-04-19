@@ -12,6 +12,7 @@ COPY package.json package-lock.json ./
 
 RUN npm install
 
+RUN npm i -g sequelize-cli
 
 FROM node:14.17 AS runner
 WORKDIR /srv/app

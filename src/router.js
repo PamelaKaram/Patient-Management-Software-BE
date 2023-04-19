@@ -5,48 +5,112 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import authenticated from "./middlewares/authentication.js";
 import isAuthorized from "./middlewares/authorization.js";
+import { client, updateTypesense } from "../config/typesense.js";
+
 import * as dotenv from "dotenv";
 dotenv.config();
 
 const router = express.Router();
 
-router.post("/registerPatient", signupValidation, async (req, res) => {
-  // LOWER() for lower case
-  // escape() method sanitizes the input to prevent SQL injection
-  const { firstName, lastName, email, birthday, phoneNumber } = req.body;
-  console.log(req.body);
-  try {
-    const getUser = await sequelize.query(
-      `SELECT * FROM users WHERE LOWER(email) = LOWER(${sequelize.escape(
-        email
-      )});`
-    );
-    if (getUser[0].length > 0) {
-      return res.status(409).send({
-        msg: "Email already in use!",
+router.post(
+  "/registerPatient",
+  authenticated,
+  isAuthorized(ROLES.admin),
+  async (req, res) => {
+    // LOWER() for lower case
+    // escape() method sanitizes the input to prevent SQL injection
+    const {
+      firstName,
+      lastName,
+      email,
+      birthday,
+      phoneNumber,
+      createdAt,
+      updatedAt,
+    } = req.body;
+    try {
+      const getUser = await sequelize.query(
+        `SELECT * FROM users WHERE LOWER(email) = LOWER(${sequelize.escape(
+          email
+        )});`
+      );
+      if (getUser[0].length > 0) {
+        return res.status(409).send({
+          msg: "Email already in use!",
+        });
+      }
+      const password = generateRandomPassword(8);
+      const hash = await bcrypt.hash(password, 10);
+      await sequelize.query(
+        `INSERT INTO users (email, lastName, firstName, phoneNumber, birthday, password, role, createdAt, updatedAt) VALUES (${sequelize.escape(
+          email
+        )}, ${sequelize.escape(lastName)}, ${sequelize.escape(
+          firstName
+        )}, ${sequelize.escape(phoneNumber)}, ${sequelize.escape(
+          birthday
+        )}, ${sequelize.escape(password)}, ${sequelize.escape(
+          ROLES.PATIENT
+        )}, ${sequelize.escape(createdAt)}, ${sequelize.escape(updatedAt)});`
+      );
+      await updateTypesense();
+      return res.status(201).send({
+        msg: "The user has been registered",
+      });
+    } catch (e) {
+      console.log(e);
+      return res.status(500).send({
+        msg: e,
       });
     }
-    const password = generateRandomPassword(8);
-    const hash = await bcrypt.hash(password, 10);
-    await sequelize.query(
-      `INSERT INTO users (email, lastName, firstName, phoneNumber, birthday, password, role) VALUES (${sequelize.escape(
-        email
-      )}, ${sequelize.escape(lastName)}, ${sequelize.escape(
-        firstName
-      )}, ${sequelize.escape(phoneNumber)}, ${sequelize.escape(
-        birthday
-      )}, ${sequelize.escape(password)}, ${sequelize.escape(ROLES.PATIENT)});`
-    );
-    return res.status(201).send({
-      msg: "The user has been registered",
-    });
-  } catch (e) {
-    console.log(e);
-    return res.status(500).send({
-      msg: e,
-    });
   }
-});
+);
+
+// pharmacy has firstName only
+router.post(
+  "/addPharmacy",
+  authenticated,
+  isAuthorized(ROLES.admin),
+  async (req, res) => {
+    // LOWER() for lower case
+    // escape() method sanitizes the input to prevent SQL injection
+    const { email, birthday, phoneNumber, createdAt, updatedAt, name } =
+      req.body;
+    try {
+      const getUser = await sequelize.query(
+        `SELECT * FROM users WHERE LOWER(email) = LOWER(${sequelize.escape(
+          email
+        )});`
+      );
+      if (getUser[0].length > 0) {
+        return res.status(409).send({
+          msg: "Email already in use!",
+        });
+      }
+      const password = generateRandomPassword(8);
+      const hash = await bcrypt.hash(password, 10);
+      await sequelize.query(
+        `INSERT INTO users (email, firstName, phoneNumber, birthday, password, role, createdAt, updatedAt) VALUES (${sequelize.escape(
+          email
+        )}, ${sequelize.escape(name)}, ${sequelize.escape(
+          phoneNumber
+        )}, ${sequelize.escape(birthday)}, ${sequelize.escape(
+          password
+        )}, ${sequelize.escape(ROLES.PHARMACY)}, ${sequelize.escape(
+          createdAt
+        )}, ${sequelize.escape(updatedAt)});`
+      );
+      await updateTypesense();
+      return res.status(201).send({
+        msg: "The pharmacy has been registered",
+      });
+    } catch (e) {
+      console.log(e);
+      return res.status(500).send({
+        msg: e,
+      });
+    }
+  }
+);
 
 const generateRandomPassword = (length) => {
   const chars =
@@ -59,12 +123,6 @@ const generateRandomPassword = (length) => {
   }
 
   return password;
-};
-
-const ROLES = {
-  PATIEMT: "patient",
-  DOCTOR: "doctor",
-  PHARMACY: "pharmacy",
 };
 
 router.post("/login", loginValidation, async (req, res) => {

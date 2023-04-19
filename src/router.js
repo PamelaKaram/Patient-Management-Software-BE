@@ -48,7 +48,7 @@ router.post(
           firstName
         )}, ${sequelize.escape(phoneNumber)}, ${sequelize.escape(
           birthday
-        )}, ${sequelize.escape(password)}, ${sequelize.escape(
+        )}, ${sequelize.escape(hash)}, ${sequelize.escape(
           ROLES.PATIENT
         )}, ${sequelize.escape(createdAt)}, ${sequelize.escape(updatedAt)});`
       );

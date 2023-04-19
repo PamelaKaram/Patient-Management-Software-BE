@@ -30,7 +30,7 @@ services:
       - "8108:8108"
     volumes:
       - ./typesense-data:/data
-    command: '--data-dir /data --api-key=xyz --enable-cors'
+    command: '--data-dir /data --api-key=e970f3edddd18b36522 --enable-cors'
 
 volumes:
   pms-mysql.1:

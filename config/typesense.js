@@ -15,53 +15,93 @@ export const client = new Typesense.Client({
   connectionTimeoutSeconds: 2,
 });
 
-export const usersSchema = {
-  name: "users",
+export const patientsSchema = {
+  name: "patients",
   fields: [
     { name: "firstName", type: "string" },
     { name: "lastName", type: "string" },
   ],
 };
 
-export async function updateTypesense() {
+export const pharmaciesSchema = {
+  name: "pharmacies",
+  fields: [
+    { name: "firstName", type: "string" },
+    { name: "lastName", type: "string" },
+  ],
+};
+
+export async function updatePatientSchema() {
   try {
-    await client.collections("users").delete();
-    console.log("Deleting existing collection: users");
+    await client.collections("patients").delete();
+    console.log("Deleting existing collection: patients");
   } catch (e) {
-    console.log("On deleting users: ", e);
+    console.log("On deleting patients: ", e);
   }
 
   client
     .collections()
-    .create(usersSchema)
+    .create(patientsSchema)
     .then(function (data) {
       console.log(data);
     });
 
-  let usersData;
+  let patientsData;
   //convert to JSON to be able to import to typesense
   try {
-    usersData = await sequelize.query(
+    patientsData = await sequelize.query(
       `SELECT JSON_ARRAYAGG(JSON_OBJECT('_id', id, 'firstName', firstName, 'lastName', lastName))
-            FROM users;`
-    );
-    console.log(
-      usersData[0][0][
-        "JSON_ARRAYAGG(JSON_OBJECT('_id', id, 'firstName', firstName, 'lastName', lastName))"
-      ]
+            FROM users WHERE role="patient";`
     );
   } catch (e) {
     console.log(e);
   }
 
   client
-    .collections("users")
+    .collections("patients")
     .documents()
     .import(
-      usersData[0][0][
+      patientsData[0][0][
         "JSON_ARRAYAGG(JSON_OBJECT('_id', id, 'firstName', firstName, 'lastName', lastName))"
       ]
     );
 }
 
-updateTypesense();
+export async function updatePharmacySchema() {
+  try {
+    await client.collections("pharmacies").delete();
+    console.log("Deleting existing collection: pharmacies");
+  } catch (e) {
+    console.log("On deleting pharmacies: ", e);
+  }
+
+  client
+    .collections()
+    .create(pharmaciesSchema)
+    .then(function (data) {
+      console.log(data);
+    });
+
+  let pharmaciesData;
+  //convert to JSON to be able to import to typesense
+  try {
+    pharmaciesData = await sequelize.query(
+      `SELECT JSON_ARRAYAGG(JSON_OBJECT('_id', id, 'firstName', firstName, 'lastName', lastName))
+            FROM users WHERE role="pharmacy";`
+    );
+  } catch (e) {
+    console.log(e);
+  }
+
+  client
+    .collections("pharmacies")
+    .documents()
+    .import(
+      pharmaciesData[0][0][
+        "JSON_ARRAYAGG(JSON_OBJECT('_id', id, 'firstName', firstName, 'lastName', lastName))"
+      ]
+    );
+}
+
+updatePatientSchema();
+updatePharmacySchema();

@@ -133,35 +133,67 @@ router.post("/login", loginValidation, async (req, res) => {
         email
       )});`
     );
-    if (getUser.length === 0) {
+    const user = getUser[0][0];
+    if (user.length === 0) {
+      console.log("here");
       return res.status(409).send({
         msg: "Email or password is incorrect",
       });
     }
-    const match = await bcrypt.compare(password, getUser[0].password);
+    const match = await bcrypt.compare(password, user.password);
+    console.log(match, password, user.password);
     if (!match) {
       return res.status(409).send({
         msg: "Email or password is incorrect",
       });
     }
-    const user = {
-      id: getUser[0].id,
-      role: ROLES.PATIENT,
+    const userToken = {
+      id: user.id,
+      role: user.role,
     };
-    const accessToken = jwt.sign(user, process.env.JWT_ACCESS_TOKEN, {
+    console.log(userToken);
+    const accessToken = jwt.sign(userToken, process.env.JWT_ACCESS_TOKEN, {
       expiresIn: "15min",
     });
-    const refreshToken = jwt.sign(user, process.env.JWT_REFRESH_TOKEN);
+    const refreshToken = jwt.sign(userToken, process.env.JWT_REFRESH_TOKEN);
+    await sequelize.query(
+      `INSERT into refreshTokens (userId, refreshToken, createdAt, updatedAt) VALUES (${sequelize.escape(
+        user.id
+      )}, ${sequelize.escape(refreshToken)}, '${new Date()
+        .toISOString()
+        .slice(0, 19)
+        .replace("T", " ")}', '${new Date()
+        .toISOString()
+        .slice(0, 19)
+        .replace("T", " ")}')`
+    );
     return res.status(200).send({
       accessToken,
       refreshToken,
-      user: getUser[0],
+      user: userToken,
     });
   } catch (e) {
     console.log(e);
     return res.status(500).send({
       msg: err,
     });
+
+router.post("/logout", authenticated, async (req, res) => {
+  const { refreshToken } = req.body;
+  if (!refreshToken) return res.sendStatus(401);
+  try {
+    const decode = await jwt.verify(
+      refreshToken,
+      process.env.JWT_REFRESH_TOKEN
+    );
+    await sequelize.query(
+      `DELETE FROM refreshTokens WHERE userId = ${sequelize.escape(
+        decode.id
+      )} AND refreshToken = ${sequelize.escape(refreshToken)};`
+    );
+    return res.sendStatus(204).send("Logged out successfully");
+  } catch (e) {
+    return res.sendStatus(403);
   }
 });
 

@@ -1,14 +1,14 @@
 import express from "express";
 import sequelize from "./models/index.js";
-import { signupValidation, loginValidation, ROLES } from "./validation.js";
+import { loginValidation, ROLES } from "../validation.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import authenticated from "./middlewares/authentication.js";
-import isAuthorized from "./middlewares/authorization.js";
+import authenticated from "../middlewares/authentication.js";
+import isAuthorized from "../middlewares/authorization.js";
 import {
   updatePatientSchema,
   updatePharmacySchema,
-} from "../config/typesense.js";
+} from "../../config/typesense.js";
 
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -269,26 +269,6 @@ router.post("/token", async (req, res) => {
   } catch (e) {
     return res.sendStatus(403);
   }
-});
-
-router.get("/user", authenticated, async (req, res) => {
-  try {
-    const getUser = await sequelize.query(
-      `SELECT * FROM users WHERE id = ${sequelize.escape(req.user.id)};`
-    );
-    return res.status(200).send({
-      user: getUser[0],
-    });
-  } catch (e) {
-    console.log(e);
-    return res.status(500).send({
-      msg: e,
-    });
-  }
-});
-
-router.get("/admin", authenticated, isAuthorized(ROLES.admin), (req, res) => {
-  res.send("Admin page");
 });
 
 export default router;

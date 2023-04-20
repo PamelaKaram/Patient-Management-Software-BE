@@ -1,7 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
-import router from "./router.js";
+import auth from "./routes/auth.js";
 
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -22,7 +22,8 @@ app.use(
 
 app.use(cors());
 
-app.use("/api", router); //add versioning
+app.use("/api/v1/auth", auth);
+app.use("/api/v1/auth", auth);
 
 app.use((err, res) => {
   console.log(err);

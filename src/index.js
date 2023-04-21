@@ -28,7 +28,7 @@ app.use("/api/v1/appointments", appointments);
 
 app.use((err, res) => {
   err.statusCode = err.statusCode || 500;
-  err.message = err.message || "Internal Server Error";
+  err.message = err.message || "Internal Server Error: Invalid route";
   res.status(err.statusCode).json({
     message: err.message,
   });

@@ -147,50 +147,50 @@ router.post(
   }
 );
 
-// router.post("/addDoctor", async (req, res) => {
-//   // LOWER() for lower case
-//   // escape() method sanitizes the input to prevent SQL injection
-//   const { email, birthday, phoneNumber, password, firstName, lastName } =
-//     req.body;
-//   try {
-//     const getUser = await sequelize.query(
-//       `SELECT * FROM users WHERE LOWER(email) = LOWER(${sequelize.escape(
-//         email
-//       )});`
-//     );
-//     if (getUser[0].length > 0) {
-//       return res.status(409).send({
-//         msg: "Email already in use!",
-//       });
-//     }
-//     const hash = await bcrypt.hash(password, 10);
-//     await sequelize.query(
-//       `INSERT INTO users (email, firstName, lastName, phoneNumber, birthday, password, role, createdAt, updatedAt) VALUES (${sequelize.escape(
-//         email
-//       )}, ${sequelize.escape(firstName)}, ${sequelize.escape(
-//         lastName
-//       )}, ${sequelize.escape(phoneNumber)}, ${sequelize.escape(
-//         birthday
-//       )}, ${sequelize.escape(hash)}, ${sequelize.escape(
-//         Roles.DOCTOR
-//       )}, '${new Date()
-//         .toISOString()
-//         .slice(0, 19)
-//         .replace("T", " ")}', '${new Date()
-//         .toISOString()
-//         .slice(0, 19)
-//         .replace("T", " ")}');`
-//     );
-//     return res.status(201).send({
-//       msg: "The Doctor has been registered",
-//     });
-//   } catch (e) {
-//     console.log(e);
-//     return res.status(500).send({
-//       msg: e,
-//     });
-//   }
-// });
+router.post("/addDoctor", async (req, res) => {
+  // LOWER() for lower case
+  // escape() method sanitizes the input to prevent SQL injection
+  const { email, birthday, phoneNumber, password, firstName, lastName } =
+    req.body;
+  try {
+    const getUser = await sequelize.query(
+      `SELECT * FROM users WHERE LOWER(email) = LOWER(${sequelize.escape(
+        email
+      )});`
+    );
+    if (getUser[0].length > 0) {
+      return res.status(409).send({
+        msg: "Email already in use!",
+      });
+    }
+    const hash = await bcrypt.hash(password, 10);
+    await sequelize.query(
+      `INSERT INTO users (email, firstName, lastName, phoneNumber, birthday, password, role, createdAt, updatedAt) VALUES (${sequelize.escape(
+        email
+      )}, ${sequelize.escape(firstName)}, ${sequelize.escape(
+        lastName
+      )}, ${sequelize.escape(phoneNumber)}, ${sequelize.escape(
+        birthday
+      )}, ${sequelize.escape(hash)}, ${sequelize.escape(
+        Roles.DOCTOR
+      )}, '${new Date()
+        .toISOString()
+        .slice(0, 19)
+        .replace("T", " ")}', '${new Date()
+        .toISOString()
+        .slice(0, 19)
+        .replace("T", " ")}');`
+    );
+    return res.status(201).send({
+      msg: "The Doctor has been registered",
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).send({
+      msg: e,
+    });
+  }
+});
 
 router.post("/login", loginValidation, async (req, res) => {
   const errors = validationResult(req);
@@ -266,7 +266,7 @@ router.post("/logout", authenticated, async (req, res) => {
   } catch (e) {
     return res.sendStatus(403);
   }
-});
+}); //get refresh token from header jwt, check if refreshtoken in db in /token
 
 router.post("/token", async (req, res) => {
   const { refreshToken } = req.body;

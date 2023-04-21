@@ -1,5 +1,5 @@
 import express from "express";
-import sequelize from "./models/index.js";
+import sequelize from "../models/index.js";
 import { loginValidation, ROLES } from "../validation.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";

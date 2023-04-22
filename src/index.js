@@ -25,6 +25,7 @@ app.use(cors());
 
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/appointments", appointments);
+app.use("/api/v1/conditions", conditions);
 
 app.use((err, res) => {
   err.statusCode = err.statusCode || 500;

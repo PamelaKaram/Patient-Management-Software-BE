@@ -10,6 +10,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import authenticated from "../middlewares/authentication.js";
 import isAuthorized from "../middlewares/authorization.js";
+import Roles from "../enums/roles.js";
+
 // import {
 //   updatePatientSchema,
 //   updatePharmacySchema,

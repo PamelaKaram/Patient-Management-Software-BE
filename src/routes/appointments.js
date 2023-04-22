@@ -66,4 +66,28 @@ router.get(
   }
 );
 
+router.get(
+  "/getFuture",
+  authenticated,
+  isAuthorized(Roles.DOCTOR),
+  async (req, res) => {
+    const today = new Date();
+    const dateString = today.toISOString().slice(0,19);
+    try {
+      console.log(today);
+      const past_appointments = await sequelize.query(
+        `SELECT appointments.*, users.firstName, users.lastName FROM appointments, users WHERE appointments.patientId = users.id AND appointments.date > ${sequelize.escape(today)}`);
+      res.status(200).send({
+        msg: "Future appointments retrieved successfully!",
+        past_appointments,
+      });
+    } catch (err) {
+      res.status(500).send({
+        msg: "Error retrieving future appointments!",
+        err,
+      });
+    }
+  }
+);
+
 export default router;

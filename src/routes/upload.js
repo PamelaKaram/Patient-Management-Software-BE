@@ -44,3 +44,14 @@ const uploadImage = multer({
   },
 });
 
+router.post("/", uploadImage.single("file"), async function (req, res, next) {
+  res.send("Successfully uploaded " + req.file.location + " location!");
+});
+
+router.get("/list", async (req, res) => {
+  const command = new ListObjectsCommand({ Bucket: BUCKET });
+  const response = await s3.send(command);
+  let x = response.Contents.map((item) => item.Key);
+  res.send(x);
+});
+

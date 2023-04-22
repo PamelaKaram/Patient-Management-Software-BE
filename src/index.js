@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import auth from "./routes/auth.js";
+import appointments from "./routes/appointments.js";
 
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -23,12 +24,11 @@ app.use(
 app.use(cors());
 
 app.use("/api/v1/auth", auth);
-app.use("/api/v1/auth", auth);
+app.use("/api/v1/appointments", appointments);
 
 app.use((err, res) => {
-  console.log(err);
   err.statusCode = err.statusCode || 500;
-  err.message = err.message || "Internal Server Error";
+  err.message = err.message || "Internal Server Error: Invalid route";
   res.status(err.statusCode).json({
     message: err.message,
   });

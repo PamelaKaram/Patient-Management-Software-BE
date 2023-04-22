@@ -1,10 +1,16 @@
 import express from "express";
 import sequelize from "../models/index.js";
-import { loginValidation, ROLES } from "../validation.js";
+import {
+  addPatientValidation,
+  loginValidation,
+  addPharmacyValidation,
+} from "../validation.js";
+import { validationResult } from "express-validator";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import authenticated from "../middlewares/authentication.js";
 import isAuthorized from "../middlewares/authorization.js";
+import Roles from "../enums/roles.js";
 import {
   updatePatientSchema,
   updatePharmacySchema,
@@ -30,11 +36,16 @@ const generateRandomPassword = (length) => {
 
 router.post(
   "/registerPatient",
+  addPatientValidation,
   authenticated,
-  isAuthorized(ROLES.DOCTOR),
+  isAuthorized(Roles.DOCTOR),
   async (req, res) => {
     // LOWER() for lower case
     // escape() method sanitizes the input to prevent SQL injection
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
     const { firstName, lastName, email, birthday, phoneNumber } = req.body;
     try {
       const getUser = await sequelize.query(
@@ -57,7 +68,7 @@ router.post(
         )}, ${sequelize.escape(phoneNumber)}, ${sequelize.escape(
           birthday
         )}, ${sequelize.escape(hash)}, ${sequelize.escape(
-          ROLES.PATIENT
+          Roles.PATIENT
         )}, '${new Date()
           .toISOString()
           .slice(0, 19)
@@ -81,12 +92,17 @@ router.post(
 
 router.post(
   "/addPharmacy",
+  addPatientValidation,
   authenticated,
-  isAuthorized(ROLES.DOCTOR),
+  isAuthorized(Roles.DOCTOR),
   async (req, res) => {
     // LOWER() for lower case
     // escape() method sanitizes the input to prevent SQL injection
-    const { email, birthday, phoneNumber, name } = req.body;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const { email, phoneNumber, name } = req.body;
     try {
       const getUser = await sequelize.query(
         `SELECT * FROM users WHERE LOWER(email) = LOWER(${sequelize.escape(
@@ -105,9 +121,12 @@ router.post(
           email
         )}, "Pharmacy", ${sequelize.escape(name)}, ${sequelize.escape(
           phoneNumber
-        )}, ${sequelize.escape(birthday)}, ${sequelize.escape(
-          hash
-        )}, ${sequelize.escape(ROLES.PHARMACY)}, '${new Date()
+        )}, '${new Date()
+          .toISOString()
+          .slice(0, 19)
+          .replace("T", " ")}', ${sequelize.escape(hash)}, ${sequelize.escape(
+          Roles.PHARMACY
+        )}, '${new Date()
           .toISOString()
           .slice(0, 19)
           .replace("T", " ")}', '${new Date()
@@ -153,7 +172,7 @@ router.post("/addDoctor", async (req, res) => {
       )}, ${sequelize.escape(phoneNumber)}, ${sequelize.escape(
         birthday
       )}, ${sequelize.escape(hash)}, ${sequelize.escape(
-        ROLES.DOCTOR
+        Roles.DOCTOR
       )}, '${new Date()
         .toISOString()
         .slice(0, 19)
@@ -174,8 +193,11 @@ router.post("/addDoctor", async (req, res) => {
 });
 
 router.post("/login", loginValidation, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
   const { email, password } = req.body;
-  console.log(email, password);
   try {
     const getUser = await sequelize.query(
       `SELECT * FROM users WHERE LOWER(email) = LOWER(${sequelize.escape(
@@ -200,7 +222,6 @@ router.post("/login", loginValidation, async (req, res) => {
       id: user.id,
       role: user.role,
     };
-    console.log(userToken);
     const accessToken = jwt.sign(userToken, process.env.JWT_ACCESS_TOKEN, {
       expiresIn: "15min",
     });
@@ -222,7 +243,6 @@ router.post("/login", loginValidation, async (req, res) => {
       user: userToken,
     });
   } catch (e) {
-    console.log(e);
     return res.status(500).send({
       msg: e,
     });
@@ -246,7 +266,7 @@ router.post("/logout", authenticated, async (req, res) => {
   } catch (e) {
     return res.sendStatus(403);
   }
-});
+}); //get refresh token from header jwt, check if refreshtoken in db in /token
 
 router.post("/token", async (req, res) => {
   const { refreshToken } = req.body;

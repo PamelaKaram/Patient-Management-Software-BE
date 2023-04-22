@@ -72,7 +72,7 @@ router.get(
   isAuthorized(Roles.DOCTOR),
   async (req, res) => {
     const today = new Date();
-    const dateString = today.toISOString().slice(0,19);
+    const dateString = today.toISOString().slice(0,10);
     try {
       console.log(today);
       const past_appointments = await sequelize.query(
@@ -104,6 +104,30 @@ router.get(
     } catch (err) {
       res.status(500).send({
         msg: "Error retrieving all appointments!",
+        err,
+      });
+    }
+  }
+);
+
+router.get(
+  "/patientGetPast",
+  authenticated,
+  isAuthorized(Roles.PATIENT),
+  async (req, res) => {
+    const email = req.body;
+    const today = new Date();
+    const dateString = today.toISOString().slice(0,19);
+    try {
+      const past_appointments = await sequelize.query(
+        `SELECT appointments.* FROM appointments, users WHERE appointments.patientId = users.id AND date <${sequelize.escape(dateString)} `);
+      res.status(200).send({
+        msg: "Past appointments retrieved successfully!",
+        past_appointments,
+      });
+    } catch (err) {
+      res.status(500).send({
+        msg: "Error retrieving past appointments!",
         err,
       });
     }

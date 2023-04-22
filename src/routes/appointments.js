@@ -52,7 +52,7 @@ router.get(
     try {
       console.log(today);
       const past_appointments = await sequelize.query(
-        `SELECT appointments.*, users.firstName, users.lastName FROM appointments, users WHERE appointments.patientId = users.id AND appointments.date < ${sequelize.escape(today)}`);
+        `SELECT appointments.*, users.firstName, users.lastName FROM appointments, users WHERE appointments.patientId = users.id AND appointments.date < ${sequelize.escape(dateString)}`);
       res.status(200).send({
         msg: "Past appointments retrieved successfully!",
         past_appointments,

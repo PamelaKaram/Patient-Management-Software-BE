@@ -55,3 +55,26 @@ router.get("/list", async (req, res) => {
   res.send(x);
 });
 
+router.get("/download/:filename", async (req, res) => {
+  const filename = req.params.filename;
+  const command = new GetObjectCommand({
+    Bucket: BUCKET,
+    Key: "1682169212173_file_pass.txt",
+  });
+  const response = await s3.send(command);
+  const contentType = response.ContentType;
+  res.set({
+    "Content-Type": contentType,
+    "Content-Disposition": `attachment; filename=${filename}`,
+  });
+  res.send(response.Body.toString());
+});
+
+router.delete("/delete/:filename", async (req, res) => {
+  const filename = req.params.filename;
+  const command = new DeleteObjectCommand({ Bucket: BUCKET, Key: filename });
+  const response = await s3.send(command);
+  res.send("File Deleted Successfully");
+});
+
+export default router;

@@ -2,15 +2,14 @@ import Sequelize from "sequelize";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-const sequelize = new Sequelize(
-  process.env.DB_NAME,
-  process.env.DB_USER,
-  process.env.DB_PASSWORD_DEV,
-  {
-    host: process.env.DB_HOST_DEV,
+const sequelize = new Sequelize({
+  database: "patient_software",
+  username: "root",
+  password: "",
+    host: "localhost",
     dialect: "mysql",
-  }
-);
+    port: 3306,
+});
 
 sequelize
   .authenticate()

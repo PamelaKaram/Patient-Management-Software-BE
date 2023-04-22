@@ -10,11 +10,10 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import authenticated from "../middlewares/authentication.js";
 import isAuthorized from "../middlewares/authorization.js";
-import Roles from "../enums/roles.js";
-import {
-  updatePatientSchema,
-  updatePharmacySchema,
-} from "../../config/typesense.js";
+// import {
+//   updatePatientSchema,
+//   updatePharmacySchema,
+// } from "../../config/typesense.js";
 
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -77,7 +76,7 @@ router.post(
           .slice(0, 19)
           .replace("T", " ")}');`
       );
-      await updatePatientSchema();
+      //await updatePatientSchema();
       return res.status(201).send({
         msg: "The user has been registered",
       });
@@ -134,7 +133,7 @@ router.post(
           .slice(0, 19)
           .replace("T", " ")}');`
       );
-      await updatePharmacySchema();
+      // await updatePharmacySchema();
       return res.status(201).send({
         msg: "The pharmacy has been registered",
       });

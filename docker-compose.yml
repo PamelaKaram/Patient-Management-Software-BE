@@ -20,7 +20,6 @@ services:
     ports:
       - 3366:3306
     environment: 
-      MYSQL_USER: root
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: patient_software
   typesense:

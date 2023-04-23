@@ -1,5 +1,6 @@
 import express from "express";
 import sequelize from "../models/index.js";
+import nodeMailer from "nodemailer";
 import {
   addPatientValidation,
   loginValidation,

@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import auth from "./routes/auth.js";
 import appointments from "./routes/appointments.js";
-
+import prescriptions from "./routes/prescriptions.js";
 import * as dotenv from "dotenv";
 dotenv.config();
 
@@ -25,6 +25,7 @@ app.use(cors());
 
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/appointments", appointments);
+app.use("/api/v1/prescriptions", prescriptions);
 
 app.use((err, res) => {
   err.statusCode = err.statusCode || 500;

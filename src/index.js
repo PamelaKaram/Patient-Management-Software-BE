@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import auth from "./routes/auth.js";
 import appointments from "./routes/appointments.js";
+import conditions from "./routes/conditions.js";
 
 import * as dotenv from "dotenv";
 dotenv.config();

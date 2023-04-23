@@ -1,4 +1,5 @@
 import express from "express";
+import nodeMailer from "nodemailer";
 import sequelize from "../models/index.js";
 import {
   addPatientValidation,
@@ -78,6 +79,26 @@ router.post(
           .slice(0, 19)
           .replace("T", " ")}');`
       );
+
+      const transporter = nodeMailer.createTransport({
+        service: "outlook",
+        auth: {
+          user: "dr email",
+          pass: "dr pass",
+        },
+      });
+
+      const mailOptions = {
+        from: "dr email",
+        to: email,
+        subject: "Welcome to the Health Care System",
+        text: `Hello ${firstName} ${lastName},\n\nYou have been registered to the Health Care System.\n\n
+        Your email is: ${email}\n\n
+        Your password is: ${password}\n\nPlease change your password after logging in.\n\nBest regards,\nHealth Care System`,
+      };
+
+      await transporter.sendMail(mailOptions);
+
       //await updatePatientSchema();
       return res.status(201).send({
         msg: "The user has been registered",

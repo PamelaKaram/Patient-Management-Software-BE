@@ -42,4 +42,28 @@ router.post(
   }
 );
 
+router.get(
+  "/patientGetPast",
+  authenticated,
+  isAuthorized(Roles.PATIENT),
+  async (req, res) => {
+    const { email, fromDate, tillDate} = req.body;
+    const fromDateString = fromDate.toISOString().slice(0,19);
+    const tillDateString = tillDate.toISOString().slice(0,19);
+    try {
+      const past_appointments = await sequelize.query(
+        `SELECT appointments.*, users.email FROM appointments, users WHERE appointments.patientId = users.id AND users.email = ${sequelize.escape(email)} AND appointments.date <= ${sequelize.escape(tillDateString)} AND appointments.date >= ${sequelize.escape(fromDateString)}`);
+      res.status(200).send({
+        msg: "Appointments retrieved successfully!",
+        past_appointments,
+      });
+    } catch (err) {
+      res.status(500).send({
+        msg: "Error retrieving Appointments!",
+        err,
+      });
+    }
+  }
+);
+
 export default router;

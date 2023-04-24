@@ -1,7 +1,10 @@
 import cron from "node-cron";
+import getNextAppointments from "./hooks/appointments.js";
 
 export default function () {
-  cron.schedule("0 1 * * *", () => {
-    console.log("Running a task every day at midnight");
+  // runs every day at 6:00 am
+  cron.schedule("0 6 * * *", async () => {
+    await getNextAppointments();
+  });
   });
 }

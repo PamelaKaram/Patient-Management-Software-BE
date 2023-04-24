@@ -31,9 +31,9 @@ router.post("/addMedicine", async (req, res) => {
     );
     const tomorrow = new Date(new Date());
     tomorrow.setDate(tomorrow.getDate() + 1);
-    // send medicine reminder at 6am
+    // send medicine reminder at 5am
     const dateTime = new Date(
-      tomorrow.toISOString().split("T")[0] + "T" + "06:00:00" + "Z"
+      tomorrow.toISOString().split("T")[0] + "T" + "05:00:00" + "Z"
     );
     await sequelize.query(
       `INSERT INTO queues (jobType, data, time, createdAt, updatedAt) VALUES ('medicine', '{"id": ${patientId}}', ${sequelize.escape(
@@ -46,7 +46,6 @@ router.post("/addMedicine", async (req, res) => {
         .slice(0, 19)
         .replace("T", " ")}');`
     );
-    console.log(medicalPrescription);
     res.status(201).send({
       msg: "Medicines created successfully!",
       medicalQueries,

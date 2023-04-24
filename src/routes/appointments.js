@@ -28,7 +28,7 @@ router.post("/create", async (req, res) => {
     const newDate = new Date(date); // change date to before one day, continue testing
     newDate.setDate(newDate.getDate() - 1);
     const dateTime = new Date(
-      newDate.toISOString().split("T")[0] + "T" + time + "Z"
+      newDate.toISOString().split("T")[0] + "T" + "05:00:00" + "Z"
     );
     const job = await sequelize.query(
       `INSERT INTO queues (jobType, data, time, createdAt, updatedAt) VALUES ('appointment', '{"id": ${

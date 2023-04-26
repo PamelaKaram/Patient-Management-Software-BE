@@ -112,7 +112,7 @@ router.post(
 
 router.post(
   "/addPharmacy",
-  addPatientValidation,
+  addPharmacyValidation,
   authenticated,
   isAuthorized(Roles.DOCTOR),
   async (req, res) => {

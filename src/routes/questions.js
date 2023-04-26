@@ -10,7 +10,9 @@ router.post("/answer", async (req, res) => {
   const { questionId, answer } = req.body;
   try {
     await sequelize.query(
-      `UPDATE questions SET answer = '${answer}' WHERE id = ${questionId}`
+      `UPDATE patient_questions SET answer = '${sequelize.escape(
+        answer
+      )}' WHERE id = ${sequelize.escape(questionId)}`
     );
     res.status(200).json({
       message: "Answered successfully",

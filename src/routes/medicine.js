@@ -2,7 +2,6 @@ import express from "express";
 import sequelize from "../models/index.js";
 
 import * as dotenv from "dotenv";
-import getNextMedicine from "../hooks/medicines.js";
 dotenv.config();
 
 const router = express.Router();

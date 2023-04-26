@@ -30,4 +30,24 @@ router.post("/addCondition", async (req, res) => {
     });
   }
 });
+
+router.post("/removeCondition", async (req, res) => {
+  const { patientId, conditionId } = req.body;
+  try {
+    await sequelize.query(
+      `UPDATE conditions SET isCurrent = false WHERE id = ${sequelize.escape(
+        conditionId
+      )} AND patientId = ${sequelize.escape(patientId)};`
+    );
+    res.status(201).send({
+      msg: "Condition removed successfully!",
+    });
+  } catch (err) {
+    res.status(500).send({
+      msg: "Error removing condition!",
+      err: err.message,
+    });
+  }
+});
+
 export default router;

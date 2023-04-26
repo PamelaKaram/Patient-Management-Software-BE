@@ -8,6 +8,7 @@ import medicine from "./routes/medicine.js";
 import condition from "./routes/condition.js";
 import questions from "./routes/questions.js";
 import access from "./routes/pharmacyAccess.js";
+import rateLimit from "express-rate-limit";
 
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -15,6 +16,16 @@ dotenv.config();
 const port = process.env.PORT;
 
 const app = express();
+
+//limit each IP to 100 requests per 15 minutes
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(limiter);
 
 app.use(express.json());
 

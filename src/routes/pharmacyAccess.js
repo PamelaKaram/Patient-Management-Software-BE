@@ -30,3 +30,46 @@ router.post("/giveAccess", async (req, res) => {
   }
 });
 
+router.get("/hasAccess", async (req, res) => {
+  const { pharmacyId, patientId } = req.body;
+  try {
+    const result = await sequelize.query(
+      `SELECT * FROM pharmacy_accesses WHERE pharmacyId = ${sequelize.escape(
+        pharmacyId
+      )} AND patientId = ${sequelize.escape(patientId)} AND hasAccess = true;`
+    );
+    if (result[0][0].hasAccess) {
+      res.status(200).json({
+        message: "Access granted",
+      });
+    } else {
+      res.status(200).json({
+        message: "Access denied",
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+});
+
+router.post("/removeAccess", async (req, res) => {
+  const { pharmacyId, patientId } = req.body;
+  try {
+    await sequelize.query(
+      `UPDATE pharmacy_accesses SET hasAccess = false WHERE pharmacyId = ${sequelize.escape(
+        pharmacyId
+      )} AND patientId = ${sequelize.escape(patientId)};`
+    );
+    res.status(200).json({
+      message: "Access removed successfully",
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+});
+
+export default router;

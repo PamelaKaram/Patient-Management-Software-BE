@@ -16,11 +16,18 @@ import {
   updatePatientSchema,
   updatePharmacySchema,
 } from "../../config/typesense.js";
+import rateLimit from "express-rate-limit";
 
 import * as dotenv from "dotenv";
 dotenv.config();
 
 const router = express.Router();
+
+const loginLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 5, // max 5 requests per window
+  message: "Too many login attempts. Please try again in 10 minutes.",
+});
 
 const generateRandomPassword = (length) => {
   const chars =
@@ -212,7 +219,7 @@ router.post("/addDoctor", async (req, res) => {
   }
 });
 
-router.post("/login", loginValidation, async (req, res) => {
+router.post("/login", loginLimiter, loginValidation, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });

@@ -114,4 +114,24 @@ router.post("/addNewPrescription", async (req, res) => {
   }
 });
 
+router.get("/getMedicines", async (req, res) => {
+  const { patientId } = req.body;
+  try {
+    const medicines = await sequelize.query(
+      `SELECT * FROM medicines WHERE prescriptionId = ${sequelize.escape(
+        patientId
+      )} AND isCurrent = true;`
+    );
+    res.status(200).send({
+      msg: "Medicines fetched successfully!",
+      medicines: medicines[0],
+    });
+  } catch (err) {
+    res.status(500).send({
+      msg: "Error fetching medicines!",
+      err: err.message,
+    });
+  }
+});
+
 export default router;

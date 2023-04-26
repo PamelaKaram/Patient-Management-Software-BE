@@ -5,6 +5,7 @@ import auth from "./routes/auth.js";
 import appointments from "./routes/appointments.js";
 import upload from "./routes/upload.js";
 import medicine from "./routes/medicine.js";
+import condition from "./routes/condition.js";
 
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -29,6 +30,7 @@ app.use("/api/v1/auth", auth);
 app.use("/api/v1/appointments", appointments);
 app.use("/api/v1/upload", upload);
 app.use("/api/v1/medicine", medicine);
+app.use("/api/v1/condition", condition);
 
 app.use((err, res) => {
   err.statusCode = err.statusCode || 500;

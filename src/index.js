@@ -4,6 +4,7 @@ import cors from "cors";
 import auth from "./routes/auth.js";
 import appointments from "./routes/appointments.js";
 import upload from "./routes/upload.js";
+import medicine from "./routes/medicine.js";
 
 import * as dotenv from "dotenv";
 dotenv.config();

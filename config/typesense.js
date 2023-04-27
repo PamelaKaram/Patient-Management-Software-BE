@@ -56,15 +56,15 @@ export async function updatePatientSchema() {
   } catch (e) {
     console.log(e);
   }
-
-  client
-    .collections("patients")
-    .documents()
-    .import(
-      patientsData[0][0][
-        "JSON_ARRAYAGG(JSON_OBJECT('_id', id, 'firstName', firstName, 'lastName', lastName))"
-      ]
-    );
+  if (patientsData[0][0])
+    client
+      .collections("patients")
+      .documents()
+      .import(
+        patientsData[0][0][
+          "JSON_ARRAYAGG(JSON_OBJECT('_id', id, 'firstName', firstName, 'lastName', lastName))"
+        ]
+      );
 }
 
 export async function updatePharmacySchema() {
@@ -93,14 +93,15 @@ export async function updatePharmacySchema() {
     console.log(e);
   }
 
-  client
-    .collections("pharmacies")
-    .documents()
-    .import(
-      pharmaciesData[0][0][
-        "JSON_ARRAYAGG(JSON_OBJECT('_id', id, 'firstName', firstName, 'lastName', lastName))"
-      ]
-    );
+  if (pharmaciesData[0][0])
+    client
+      .collections("pharmacies")
+      .documents()
+      .import(
+        pharmaciesData[0][0][
+          "JSON_ARRAYAGG(JSON_OBJECT('_id', id, 'firstName', firstName, 'lastName', lastName))"
+        ]
+      );
 }
 
 updatePatientSchema();

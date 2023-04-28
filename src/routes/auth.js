@@ -350,12 +350,12 @@ router.post("/forgotPassword", async (req, res) => {
     const transporter = nodeMailer.createTransport({
       service: "outlook",
       auth: {
-        user: "habibdick2001@hotmail.com",
-        pass: "Bibo41deek",
+        user: "dr email",
+        pass: "dr pass",
       },
     });
     const mailOptions = {
-      from: "habibdick2001@hotmail.com",
+      from: "dr email",
       to: email,
       subject: "Reset Password",
       text: `Your reset code is ${code}`,

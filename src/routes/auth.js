@@ -5,6 +5,7 @@ import {
   addPatientValidation,
   loginValidation,
   addPharmacyValidation,
+  forgetPassValidation,
 } from "../validation.js";
 import { validationResult } from "express-validator";
 import bcrypt from "bcryptjs";
@@ -315,6 +316,111 @@ router.post("/token", async (req, res) => {
     });
   } catch (e) {
     return res.sendStatus(403);
+  }
+});
+
+router.post("/forgotPassword", async (req, res) => {
+  const { email } = req.body;
+  try {
+    const getUser = await sequelize.query(
+      `SELECT * FROM users WHERE LOWER(email) = LOWER(${sequelize.escape(
+        email
+      )});`
+    );
+    if (getUser[0].length ===0){
+      return res.status(404).send(
+        {
+          msg: "Email not found",
+        }
+      );
+    }
+    const code = Math.floor(100000 + Math.random() *900000);
+  
+    await sequelize.query(
+      `INSERT INTO user_verifications (userId, code, createdAt, updatedAt ) 
+      VALUES (${sequelize.escape(getUser[0][0].id)},${sequelize.escape(code)},
+      '${new Date()
+        .toISOString()
+        .slice(0, 19)
+        .replace("T", " ")}', '${new Date()
+        .toISOString()
+        .slice(0, 19)
+        .replace("T", " ")}');`
+    );
+    const transporter = nodeMailer.createTransport({
+      service: "outlook",
+      auth: {
+        user: "habibdick2001@hotmail.com",
+        pass: "Bibo41deek",
+      },
+    });
+    const mailOptions = {
+      from: "habibdick2001@hotmail.com",
+      to: email,
+      subject: "Reset Password",
+      text: `Your reset code is ${code}`,
+    };
+    await transporter.sendMail(mailOptions);
+    return res.status(200).send({
+      msg: "Email sent",
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).send({
+      msg: e,
+    });
+  }
+});
+
+router.post("/resetPassword",forgetPassValidation, async (req, res) => {
+  const { email, code, password, confirmPassword } = req.body;
+  try {
+    const getUser = await sequelize.query(
+      `SELECT * FROM users WHERE LOWER(email) = LOWER(${sequelize.escape(
+        email
+      )});`
+    );
+    if (getUser[0].length ===0){
+      return res.status(404).send(
+        {
+          msg: "Email not found",
+        }
+      );
+    }
+    const getVerification = await sequelize.query(
+      `SELECT * FROM user_verifications WHERE userId = ${sequelize.escape(
+        getUser[0][0].id
+      )} AND code = ${sequelize.escape(code)};`
+    );
+    if (getVerification[0].length === 0) {
+      return res.status(404).send({
+        msg: "Code not found",
+      });
+    }
+    if (password !== confirmPassword) {
+      return res.status(400).send({
+        msg: "Passwords do not match",
+      });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await sequelize.query(
+      `UPDATE users SET password = ${sequelize.escape(
+        hashedPassword
+      )} WHERE id = ${sequelize.escape(getUser[0][0].id)};`
+    );
+    await sequelize.query(
+      `DELETE FROM user_verifications WHERE userId = ${sequelize.escape(
+        getUser[0][0].id
+      )}`
+    );
+    return res.status(200).send({
+      msg: "Password reset successfully",
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).send({
+      msg: e,
+    });
   }
 });
 

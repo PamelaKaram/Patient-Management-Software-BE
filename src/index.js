@@ -8,6 +8,7 @@ import medicine from "./routes/medicine.js";
 import condition from "./routes/condition.js";
 import questions from "./routes/questions.js";
 import access from "./routes/pharmacyAccess.js";
+import info from "./routes/info.js";
 import rateLimit from "express-rate-limit";
 
 import * as dotenv from "dotenv";
@@ -46,6 +47,7 @@ app.use("/api/v1/medicine", medicine);
 app.use("/api/v1/condition", condition);
 app.use("/api/v1/questions", questions);
 app.use("/api/v1/access", access);
+app.use("/api/v1/info", info);
 
 app.use((err, res) => {
   err.statusCode = err.statusCode || 500;

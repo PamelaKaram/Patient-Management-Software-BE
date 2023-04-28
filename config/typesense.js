@@ -20,6 +20,7 @@ export const patientsSchema = {
   fields: [
     { name: "firstName", type: "string" },
     { name: "lastName", type: "string" },
+    { name: "uuid", type: "string" },
   ],
 };
 
@@ -28,6 +29,7 @@ export const pharmaciesSchema = {
   fields: [
     { name: "firstName", type: "string" },
     { name: "lastName", type: "string" },
+    { name: "uuid", type: "string" },
   ],
 };
 
@@ -50,7 +52,7 @@ export async function updatePatientSchema() {
   //convert to JSON to be able to import to typesense
   try {
     patientsData = await sequelize.query(
-      `SELECT JSON_ARRAYAGG(JSON_OBJECT('_id', id, 'firstName', firstName, 'lastName', lastName))
+      `SELECT JSON_ARRAYAGG(JSON_OBJECT('_id', id, 'firstName', firstName, 'lastName', lastName, 'uuid', uuid))
             FROM users WHERE role="patient";`
     );
   } catch (e) {
@@ -62,7 +64,7 @@ export async function updatePatientSchema() {
       .documents()
       .import(
         patientsData[0][0][
-          "JSON_ARRAYAGG(JSON_OBJECT('_id', id, 'firstName', firstName, 'lastName', lastName))"
+          "JSON_ARRAYAGG(JSON_OBJECT('_id', id, 'firstName', firstName, 'lastName', lastName, 'uuid', uuid))"
         ]
       );
 }
@@ -86,7 +88,7 @@ export async function updatePharmacySchema() {
   //convert to JSON to be able to import to typesense
   try {
     pharmaciesData = await sequelize.query(
-      `SELECT JSON_ARRAYAGG(JSON_OBJECT('_id', id, 'firstName', firstName, 'lastName', lastName))
+      `SELECT JSON_ARRAYAGG(JSON_OBJECT('_id', id, 'firstName', firstName, 'lastName', lastName, 'uuid', uuid))
             FROM users WHERE role="pharmacy";`
     );
   } catch (e) {
@@ -99,7 +101,7 @@ export async function updatePharmacySchema() {
       .documents()
       .import(
         pharmaciesData[0][0][
-          "JSON_ARRAYAGG(JSON_OBJECT('_id', id, 'firstName', firstName, 'lastName', lastName))"
+          "JSON_ARRAYAGG(JSON_OBJECT('_id', id, 'firstName', firstName, 'lastName', lastName, 'uuid', uuid))"
         ]
       );
 }

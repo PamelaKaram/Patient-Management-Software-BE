@@ -32,3 +32,15 @@ export const loginValidation = [
     min: 6,
   }),
 ];
+
+export const forgetPassValidation = [
+  check("email", "Please include a valid email")
+    .isEmail()
+    .normalizeEmail({ gmail_remove_dots: true }),
+  check("password", "Password must be 6 or more characters").isLength({
+    min: 6,
+  }),
+  check("code", "Please enter the right validation code that was provided to you").isLength({
+    min: 6,
+  }),
+];

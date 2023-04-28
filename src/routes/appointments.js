@@ -108,4 +108,28 @@ router.get(
   }
 );
 
+router.get(
+  "/getAvailability",
+  authenticated,
+  isAuthorized(Roles.DOCTOR),
+  async (req, res) => {
+    try {
+      const today = new Date();
+      const [all_appointments] = await sequelize.query(
+        `SELECT appointments.*, users.firstName, users.lastName 
+        FROM appointments, users 
+        WHERE appointments.patientId = users.id AND users.role = "patient" AND appointments.date >= ${sequelize.escape(today)}`);
+      res.status(200).send({
+        msg: "All appointments retrieved successfully!",
+        all_appointments,
+      });
+    } catch (err) {
+      res.status(500).send({
+        msg: "Error retrieving all appointments!",
+        err,
+      });
+    }
+  }
+);
+
 export default router;

@@ -17,6 +17,7 @@ import {
   updatePharmacySchema,
 } from "../../config/typesense.js";
 import rateLimit from "express-rate-limit";
+import { v4 as uuidv4 } from "uuid";
 
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -45,8 +46,8 @@ const generateRandomPassword = (length) => {
 router.post(
   "/registerPatient",
   addPatientValidation,
-  authenticated,
-  isAuthorized(Roles.DOCTOR),
+  // authenticated,
+  // isAuthorized(Roles.DOCTOR),
   async (req, res) => {
     // LOWER() for lower case
     // escape() method sanitizes the input to prevent SQL injection
@@ -68,8 +69,9 @@ router.post(
       }
       const password = generateRandomPassword(8);
       const hash = await bcrypt.hash(password, 10);
+
       await sequelize.query(
-        `INSERT INTO users (email, lastName, firstName, phoneNumber, birthday, password, role, createdAt, updatedAt) VALUES (${sequelize.escape(
+        `INSERT INTO users (email, lastName, firstName, phoneNumber, birthday, password, role, uuid, createdAt, updatedAt) VALUES (${sequelize.escape(
           email
         )}, ${sequelize.escape(lastName)}, ${sequelize.escape(
           firstName
@@ -77,7 +79,7 @@ router.post(
           birthday
         )}, ${sequelize.escape(hash)}, ${sequelize.escape(
           Roles.PATIENT
-        )}, '${new Date()
+        )}, '${uuidv4()}', '${new Date()
           .toISOString()
           .slice(0, 19)
           .replace("T", " ")}', '${new Date()
@@ -86,24 +88,24 @@ router.post(
           .replace("T", " ")}');`
       );
 
-      const transporter = nodeMailer.createTransport({
-        service: "outlook",
-        auth: {
-          user: "dr email",
-          pass: "dr pass",
-        },
-      });
+      // const transporter = nodeMailer.createTransport({
+      //   service: "outlook",
+      //   auth: {
+      //     user: "dr email",
+      //     pass: "dr pass",
+      //   },
+      // });
 
-      const mailOptions = {
-        from: "dr email",
-        to: email,
-        subject: "Welcome to the Health Care System",
-        text: `Hello ${firstName} ${lastName},\n\nYou have been registered to the Health Care System.\n\n
-        Your email is: ${email}\n\n
-        Your password is: ${password}\n\nPlease change your password after logging in.\n\nBest regards,\nHealth Care System`,
-      };
+      // const mailOptions = {
+      //   from: "dr email",
+      //   to: email,
+      //   subject: "Welcome to the Health Care System",
+      //   text: `Hello ${firstName} ${lastName},\n\nYou have been registered to the Health Care System.\n\n
+      //   Your email is: ${email}\n\n
+      //   Your password is: ${password}\n\nPlease change your password after logging in.\n\nBest regards,\nHealth Care System`,
+      // };
 
-      await transporter.sendMail(mailOptions);
+      // await transporter.sendMail(mailOptions);
       await updatePatientSchema();
       return res.status(201).send({
         msg: "The user has been registered",
@@ -144,7 +146,7 @@ router.post(
       const password = generateRandomPassword(8);
       const hash = await bcrypt.hash(password, 10);
       await sequelize.query(
-        `INSERT INTO users (email, firstName, lastName, phoneNumber, birthday, password, role, createdAt, updatedAt) VALUES (${sequelize.escape(
+        `INSERT INTO users (email, firstName, lastName, phoneNumber, birthday, password, role, uuid, createdAt, updatedAt) VALUES (${sequelize.escape(
           email
         )}, "Pharmacy", ${sequelize.escape(name)}, ${sequelize.escape(
           phoneNumber
@@ -153,7 +155,7 @@ router.post(
           .slice(0, 19)
           .replace("T", " ")}', ${sequelize.escape(hash)}, ${sequelize.escape(
           Roles.PHARMACY
-        )}, '${new Date()
+        )}, '${uuidv4()}', '${new Date()
           .toISOString()
           .slice(0, 19)
           .replace("T", " ")}', '${new Date()
@@ -192,7 +194,7 @@ router.post("/addDoctor", async (req, res) => {
     }
     const hash = await bcrypt.hash(password, 10);
     await sequelize.query(
-      `INSERT INTO users (email, firstName, lastName, phoneNumber, birthday, password, role, createdAt, updatedAt) VALUES (${sequelize.escape(
+      `INSERT INTO users (email, firstName, lastName, phoneNumber, birthday, password, role, uuid, createdAt, updatedAt) VALUES (${sequelize.escape(
         email
       )}, ${sequelize.escape(firstName)}, ${sequelize.escape(
         lastName
@@ -200,7 +202,7 @@ router.post("/addDoctor", async (req, res) => {
         birthday
       )}, ${sequelize.escape(hash)}, ${sequelize.escape(
         Roles.DOCTOR
-      )}, '${new Date()
+      )}, '${uuidv4()}', '${new Date()
         .toISOString()
         .slice(0, 19)
         .replace("T", " ")}', '${new Date()
@@ -219,7 +221,7 @@ router.post("/addDoctor", async (req, res) => {
   }
 });
 
-router.post("/login", loginLimiter, loginValidation, async (req, res) => {
+router.post("/login", loginValidation, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -233,7 +235,6 @@ router.post("/login", loginLimiter, loginValidation, async (req, res) => {
     );
     const user = getUser[0][0];
     if (user.length === 0) {
-      console.log("here");
       return res.status(409).send({
         msg: "Email or password is incorrect",
       });
@@ -241,6 +242,7 @@ router.post("/login", loginLimiter, loginValidation, async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     console.log(match, password, user.password);
     if (!match) {
+      console.log("here now");
       return res.status(409).send({
         msg: "Email or password is incorrect",
       });

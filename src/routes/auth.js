@@ -71,7 +71,7 @@ router.post(
       const password = generateRandomPassword(8);
       const hash = await bcrypt.hash(password, 10);
       await sequelize.query(
-        `INSERT INTO users (email, lastName, firstName, phoneNumber, birthday, password, role, createdAt, updatedAt) VALUES (${sequelize.escape(
+        `INSERT INTO users (email, lastName, firstName, phoneNumber, birthday, password, role, uuid, createdAt, updatedAt) VALUES (${sequelize.escape(
           email
         )}, ${sequelize.escape(lastName)}, ${sequelize.escape(
           firstName
@@ -79,7 +79,7 @@ router.post(
           birthday
         )}, ${sequelize.escape(hash)}, ${sequelize.escape(
           Roles.PATIENT
-        )}, '${new Date()
+        )}, '${uuidv4()}', '${new Date()
           .toISOString()
           .slice(0, 19)
           .replace("T", " ")}', '${new Date()
@@ -146,7 +146,7 @@ router.post(
       const password = generateRandomPassword(8);
       const hash = await bcrypt.hash(password, 10);
       await sequelize.query(
-        `INSERT INTO users (email, firstName, lastName, phoneNumber, birthday, password, role, createdAt, updatedAt) VALUES (${sequelize.escape(
+        `INSERT INTO users (email, firstName, lastName, phoneNumber, birthday, password, role, uuid, createdAt, updatedAt) VALUES (${sequelize.escape(
           email
         )}, "Pharmacy", ${sequelize.escape(name)}, ${sequelize.escape(
           phoneNumber
@@ -155,7 +155,7 @@ router.post(
           .slice(0, 19)
           .replace("T", " ")}', ${sequelize.escape(hash)}, ${sequelize.escape(
           Roles.PHARMACY
-        )}, '${new Date()
+        )}, '${uuidv4()}', '${new Date()
           .toISOString()
           .slice(0, 19)
           .replace("T", " ")}', '${new Date()
@@ -194,7 +194,7 @@ router.post("/addDoctor", async (req, res) => {
     }
     const hash = await bcrypt.hash(password, 10);
     await sequelize.query(
-      `INSERT INTO users (email, firstName, lastName, phoneNumber, birthday, password, role, createdAt, updatedAt) VALUES (${sequelize.escape(
+      `INSERT INTO users (email, firstName, lastName, phoneNumber, birthday, password, role, uuid, createdAt, updatedAt) VALUES (${sequelize.escape(
         email
       )}, ${sequelize.escape(firstName)}, ${sequelize.escape(
         lastName
@@ -202,7 +202,7 @@ router.post("/addDoctor", async (req, res) => {
         birthday
       )}, ${sequelize.escape(hash)}, ${sequelize.escape(
         Roles.DOCTOR
-      )}, '${new Date()
+      )}, '${uuidv4()}', '${new Date()
         .toISOString()
         .slice(0, 19)
         .replace("T", " ")}', '${new Date()

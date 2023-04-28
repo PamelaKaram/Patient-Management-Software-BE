@@ -52,8 +52,8 @@ router.get(
     const tillDateString = new Date(tillDate);
 
     try {
-      const past_appointments = await sequelize.query(
-        `SELECT appointments.*  
+      const [past_appointments] = await sequelize.query(
+        `SELECT DISTINCT appointments.*  
         FROM appointments, users 
         WHERE appointments.patientId = users.id AND users.id= ${sequelize.escape(id)} AND appointments.date BETWEEN ${sequelize.escape(fromDateString)} AND ${sequelize.escape(tillDateString)}`);
       res.status(200).send({

@@ -59,17 +59,18 @@ router.get(
   authenticated,
   isAuthorized(Roles.DOCTOR),
   async (req, res) => {
-    const { fromDate, tillDate } = req.body;
-    const fromDateString = fromDate.toISOString().slice(0,19);
-    const tillDateString= tillDate.toISOString().slice(0,19);
-
+    const { fromDate, tillDate } = req.query;
+    const fromDateString = new Date(fromDate);
+    const tillDateString = new Date(tillDate);
+    
     try {
-      console.log(today);
-      const past_appointments = await sequelize.query(
-        `SELECT appointments.*, users.firstName, users.lastName FROM appointments, users WHERE appointments.patientId = users.id AND appointments.date >= ${sequelize.escape(fromDateString)} AND appointments.date >= ${sequelize.escape(tillDateString)} `);
+      const [appointments] = await sequelize.query(
+        `SELECT appointments.*, users.firstName, users.lastName 
+        FROM appointments, users 
+        WHERE appointments.patientId = users.id AND appointments.date BETWEEN ${sequelize.escape(fromDateString)} AND ${sequelize.escape(tillDateString)} `);
       res.status(200).send({
         msg: "Past appointments retrieved successfully!",
-        past_appointments,
+        appointments,
       });
     } catch (err) {
       res.status(500).send({

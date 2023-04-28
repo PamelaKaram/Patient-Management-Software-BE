@@ -47,7 +47,7 @@ router.get(
   authenticated,
   isAuthorized(Roles.DOCTOR),
   async (req, res) => {
-    const { fromDate, tillDate } = req.body;
+    const { fromDate, tillDate } = req.query;
     const fromDateString = new Date(fromDate);
     const tillDateString = new Date(tillDate);
     

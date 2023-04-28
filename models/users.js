@@ -20,7 +20,6 @@ module.exports = (sequelize, DataTypes) => {
       password: DataTypes.STRING,
       phoneNumber: DataTypes.STRING,
       role: DataTypes.STRING,
-      uuid: DataTypes.UUID,
     },
     {
       sequelize,

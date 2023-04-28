@@ -52,7 +52,7 @@ router.get(
     const tillDateString = new Date(tillDate);
     
     try {
-      const appointments = await sequelize.query(
+      const [appointments] = await sequelize.query(
         `SELECT appointments.*, users.firstName, users.lastName 
         FROM appointments, users 
         WHERE appointments.patientId = users.id AND appointments.date BETWEEN ${sequelize.escape(fromDateString)} AND ${sequelize.escape(tillDateString)} `);

@@ -49,7 +49,7 @@ router.get(
   async (req, res) => {
     try {
       const today = new Date();
-      const all_appointments = await sequelize.query(
+      const [all_appointments] = await sequelize.query(
         `SELECT appointments.*, users.firstName, users.lastName 
         FROM appointments, users 
         WHERE appointments.patientId = users.id AND users.role = "patient" AND appointments.date >= ${sequelize.escape(today)}`);

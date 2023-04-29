@@ -14,8 +14,8 @@ module.exports = (sequelize, DataTypes) => {
   patient_questions.init(
     {
       patientId: DataTypes.INTEGER,
-      question: DataTypes.STRING,
-      answer: DataTypes.STRING,
+      question: DataTypes.TEXT,
+      answer: DataTypes.TEXT,
       isAnswered: DataTypes.BOOLEAN,
       patientUUID: DataTypes.UUID,
     },

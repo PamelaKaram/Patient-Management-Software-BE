@@ -5,8 +5,6 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.addColumn("users", "uuid", {
       type: Sequelize.UUID,
-      defaultValue: Sequelize.UUIDV4,
-      unique: true,
     });
   },
 

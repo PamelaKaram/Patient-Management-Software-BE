@@ -5,38 +5,24 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.addColumn("appointments", "patientUUID", {
       type: Sequelize.UUID,
-      defaultValue: Sequelize.UUIDV4,
-      unique: true,
     });
     await queryInterface.addColumn("medical_conditions", "patientUUID", {
       type: Sequelize.UUID,
-      defaultValue: Sequelize.UUIDV4,
-      unique: true,
     });
     await queryInterface.addColumn("medicines", "patientUUID", {
       type: Sequelize.UUID,
-      defaultValue: Sequelize.UUIDV4,
-      unique: true,
     });
     await queryInterface.addColumn("notifications", "userUUID", {
       type: Sequelize.UUID,
-      defaultValue: Sequelize.UUIDV4,
-      unique: true,
     });
     await queryInterface.addColumn("patient_questions", "patientUUID", {
       type: Sequelize.UUID,
-      defaultValue: Sequelize.UUIDV4,
-      unique: true,
     });
     await queryInterface.addColumn("pharmacy_accesses", "patientUUID", {
       type: Sequelize.UUID,
-      defaultValue: Sequelize.UUIDV4,
-      unique: true,
     });
     await queryInterface.addColumn("pharmacy_accesses", "pharmacyUUID", {
       type: Sequelize.UUID,
-      defaultValue: Sequelize.UUIDV4,
-      unique: true,
     });
   },
 

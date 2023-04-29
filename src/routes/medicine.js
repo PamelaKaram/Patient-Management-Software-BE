@@ -90,11 +90,11 @@ router.post("/addNewPrescription", async (req, res) => {
 });
 
 router.get("/getMedicalPrescription", async (req, res) => {
-  const { patientId } = req.body;
+  const { patientUUID } = req.query;
   try {
     const medicines = await sequelize.query(
-      `SELECT * FROM medicines WHERE prescriptionId = ${sequelize.escape(
-        patientId
+      `SELECT * FROM medicines WHERE patientUUID = ${sequelize.escape(
+        patientUUID
       )} AND isCurrent = true;`
     );
     res.status(200).send({
@@ -110,11 +110,11 @@ router.get("/getMedicalPrescription", async (req, res) => {
 });
 
 router.get("/previousMedicalPrescription", async (req, res) => {
-  const { patientId } = req.body;
+  const { patientUUID } = req.query;
   try {
     const medicines = await sequelize.query(
-      `SELECT * FROM medicines WHERE prescriptionId = ${sequelize.escape(
-        patientId
+      `SELECT * FROM medicines WHERE patientUUID = ${sequelize.escape(
+        patientUUID
       )} AND isCurrent = false;`
     );
     res.status(200).send({

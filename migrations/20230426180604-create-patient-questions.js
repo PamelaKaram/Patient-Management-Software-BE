@@ -13,10 +13,10 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       question: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
       },
       answer: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
       },
       isAnswered: {
         type: Sequelize.BOOLEAN,

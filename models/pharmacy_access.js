@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class pharmacy_access extends Model {
     /**
@@ -13,13 +11,18 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  pharmacy_access.init({
-    patientId: DataTypes.INTEGER,
-    pharmacyId: DataTypes.INTEGER,
-    hasAccess: DataTypes.BOOLEAN
-  }, {
-    sequelize,
-    modelName: 'pharmacy_access',
-  });
+  pharmacy_access.init(
+    {
+      patientId: DataTypes.INTEGER,
+      pharmacyId: DataTypes.INTEGER,
+      hasAccess: DataTypes.BOOLEAN,
+      patientUUID: DataTypes.UUID,
+      pharmacyUUID: DataTypes.UUID,
+    },
+    {
+      sequelize,
+      modelName: "pharmacy_access",
+    }
+  );
   return pharmacy_access;
 };

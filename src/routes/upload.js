@@ -40,13 +40,17 @@ const s3Storage = multerS3({
 const uploadImage = multer({
   storage: s3Storage,
   limits: {
-    fileSize: 1024 * 1024 * 2, // 2mb file size
+    fileSize: 1024 * 1024 * 200, // 200mb file size
   },
 });
 
-router.post("/", uploadImage.single("file"), async function (req, res, next) {
-  res.send("Successfully uploaded " + req.file.location + " location!");
-});
+router.post(
+  "/",
+  uploadImage.single("recfile"),
+  async function (req, res, next) {
+    res.send("Successfully uploaded " + req.file.location + " location!");
+  }
+);
 
 router.get("/list", async (req, res) => {
   const command = new ListObjectsCommand({ Bucket: BUCKET });

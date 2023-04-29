@@ -2,6 +2,8 @@ const { v4: uuidv4 } = require("uuid");
 
 ("use strict");
 
+//add hash to password
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {

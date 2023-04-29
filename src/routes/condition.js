@@ -10,15 +10,9 @@ router.post("/addCondition", async (req, res) => {
   const { patientId, condition } = req.body;
   try {
     await sequelize.query(
-      `INSERT INTO conditions (patientId, description, isCurrent, createdAt, updatedAt) VALUES (${sequelize.escape(
+      `INSERT INTO conditions (patientId, description, isCurrent) VALUES (${sequelize.escape(
         patientId
-      )}, ${sequelize.escape(condition)}, true, '${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}', '${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}');`
+      )}, ${sequelize.escape(condition)}, true);`
     );
     res.status(201).send({
       msg: "Condition created successfully!",

@@ -13,17 +13,11 @@ router.post("/create", async (req, res) => {
   const { patientId, date, time, description } = req.body;
   try {
     const appointment = await sequelize.query(
-      `INSERT INTO appointments (patientId, date, time, description, createdAt, updatedAt) VALUES (${sequelize.escape(
+      `INSERT INTO appointments (patientId, date, time, description) VALUES (${sequelize.escape(
         patientId
       )}, ${sequelize.escape(date)}, ${sequelize.escape(
         time
-      )}, ${sequelize.escape(description)}, '${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}', '${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}');`
+      )}, ${sequelize.escape(description)});`
     );
     const newDate = new Date(date); // change date to before one day, continue testing
     newDate.setDate(newDate.getDate() - 1);
@@ -31,15 +25,9 @@ router.post("/create", async (req, res) => {
       newDate.toISOString().split("T")[0] + "T" + "05:00:00" + "Z"
     );
     const job = await sequelize.query(
-      `INSERT INTO queues (jobType, data, time, createdAt, updatedAt) VALUES ('appointment', '{"id": ${
+      `INSERT INTO queues (jobType, data, time) VALUES ('appointment', '{"id": ${
         appointment[0]
-      }}', ${sequelize.escape(dateTime)}, '${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}', '${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}');`
+      }}', ${sequelize.escape(dateTime)});`
     );
 
     res.status(201).send({
@@ -62,12 +50,15 @@ router.get(
     const { fromDate, tillDate } = req.query;
     const fromDateString = new Date(fromDate);
     const tillDateString = new Date(tillDate);
-    
+
     try {
       const [appointments] = await sequelize.query(
         `SELECT appointments.*, users.firstName, users.lastName 
         FROM appointments, users 
-        WHERE appointments.patientId = users.id AND appointments.date BETWEEN ${sequelize.escape(fromDateString)} AND ${sequelize.escape(tillDateString)} `);
+        WHERE appointments.patientId = users.id AND appointments.date BETWEEN ${sequelize.escape(
+          fromDateString
+        )} AND ${sequelize.escape(tillDateString)} `
+      );
       res.status(200).send({
         msg: "Past appointments retrieved successfully!",
         appointments,
@@ -86,7 +77,7 @@ router.get(
   authenticated,
   isAuthorized(Roles.PATIENT),
   async (req, res) => {
-    const { id, fromDate, tillDate} = req.query;
+    const { id, fromDate, tillDate } = req.query;
     const fromDateString = new Date(fromDate);
     const tillDateString = new Date(tillDate);
 
@@ -94,7 +85,12 @@ router.get(
       const [past_appointments] = await sequelize.query(
         `SELECT DISTINCT appointments.*  
         FROM appointments, users 
-        WHERE appointments.patientId = users.id AND users.id= ${sequelize.escape(id)} AND appointments.date BETWEEN ${sequelize.escape(fromDateString)} AND ${sequelize.escape(tillDateString)}`);
+        WHERE appointments.patientId = users.id AND users.id= ${sequelize.escape(
+          id
+        )} AND appointments.date BETWEEN ${sequelize.escape(
+          fromDateString
+        )} AND ${sequelize.escape(tillDateString)}`
+      );
       res.status(200).send({
         msg: "Appointments retrieved successfully!",
         past_appointments,
@@ -118,7 +114,10 @@ router.get(
       const [all_appointments] = await sequelize.query(
         `SELECT appointments.*, users.firstName, users.lastName 
         FROM appointments, users 
-        WHERE appointments.patientId = users.id AND users.role = "patient" AND appointments.date >= ${sequelize.escape(today)}`);
+        WHERE appointments.patientId = users.id AND users.role = "patient" AND appointments.date >= ${sequelize.escape(
+          today
+        )}`
+      );
       res.status(200).send({
         msg: "All appointments retrieved successfully!",
         all_appointments,

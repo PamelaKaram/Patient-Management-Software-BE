@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       date: DataTypes.DATEONLY,
       time: DataTypes.TIME,
       description: DataTypes.STRING,
+      patientUUID: DataTypes.UUID,
     },
     {
       sequelize,

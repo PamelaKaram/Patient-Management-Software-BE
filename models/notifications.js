@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       time: DataTypes.DATE,
       description: DataTypes.STRING,
       emailSent: DataTypes.BOOLEAN,
+      userUUID: DataTypes.UUID,
     },
     {
       sequelize,

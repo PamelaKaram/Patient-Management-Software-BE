@@ -27,35 +27,32 @@ router.post("/answer", async (req, res) => {
   }
 });
 
-router.post("/patientQuestion",
+router.post(
+  "/patientQuestion",
   authenticated,
   isAuthorized(Roles.PATIENT),
-  async (req, res)=>{
-  const { id, question} = req.body;
-  if(!question)
-  {
-    return res.status(400).json({msg: "Question is empty, please enter it"});
+  async (req, res) => {
+    const { id, question } = req.body;
+    if (!question) {
+      return res
+        .status(400)
+        .json({ msg: "Question is empty, please enter it" });
+    }
+    try {
+      await sequelize.query(
+        `INSERT INTO patient_questions (patientId, question) VALUES (${sequelize.escape(
+          id
+        )}, ${sequelize.escape(question)})`
+      );
+      res.status(200).json({
+        message: "Question added successfully",
+      });
+    } catch (err) {
+      res.status(500).json({
+        message: "Internal Server Error",
+      });
+    }
   }
-  try {
-    await sequelize.query(
-      `INSERT INTO patient_questions (patientId, question, createdAt, updatedAt) VALUES (${sequelize.escape(
-        id
-      )}, ${sequelize.escape(question)},'${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}', '${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}')`
-    );
-    res.status(200).json({
-      message: "Question added successfully",
-    });
-  }catch(err){
-    res.status(500).json({
-      message: "Internal Server Error",
-    });
-  }
-});
+);
 
 export default router;

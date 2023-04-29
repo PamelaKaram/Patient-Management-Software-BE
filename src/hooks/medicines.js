@@ -24,15 +24,9 @@ export default async function getNextMedicine() {
       tomorrow.toISOString().split("T")[0] + "T" + "05:00:00" + "Z"
     );
     await sequelize.query(
-      `INSERT INTO queues (jobType, data, time, createdAt, updatedAt) VALUES ('medicine', '{"id": ${
+      `INSERT INTO queues (jobType, data, time) VALUES ('medicine', '{"id": ${
         item.data.id
-      }}', ${sequelize.escape(dateTime)}, '${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}', '${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}');`
+      }}', ${sequelize.escape(dateTime)});`
     );
 
     await sendMedicineNotification({

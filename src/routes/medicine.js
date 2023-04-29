@@ -16,17 +16,11 @@ router.post("/addMedicine", async (req, res) => {
           item.medicine
         )}, true, ${sequelize.escape(item.description)}, ${sequelize.escape(
           item.frequency
-        )}, ${sequelize.escape(item.foodTiming)}, '${new Date()
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " ")}', '${new Date()
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " ")}')`;
+        )}, ${sequelize.escape(item.foodTiming)})`;
       })
       .join(",");
     await sequelize.query(
-      `INSERT INTO medicines (prescriptionId, medicine, isCurrent, description, frequency, foodTiming, createdAt, updatedAt) VALUES ${medicalQueries}`
+      `INSERT INTO medicines (prescriptionId, medicine, isCurrent, description, frequency, foodTiming) VALUES ${medicalQueries}`
     );
     const tomorrow = new Date(new Date());
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -35,15 +29,9 @@ router.post("/addMedicine", async (req, res) => {
       tomorrow.toISOString().split("T")[0] + "T" + "05:00:00" + "Z"
     );
     await sequelize.query(
-      `INSERT INTO queues (jobType, data, time, createdAt, updatedAt) VALUES ('medicine', '{"id": ${patientId}}', ${sequelize.escape(
+      `INSERT INTO queues (jobType, data, time) VALUES ('medicine', '{"id": ${patientId}}', ${sequelize.escape(
         dateTime
-      )}, '${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}', '${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}');`
+      )});`
     );
     res.status(201).send({
       msg: "Medicines created successfully!",
@@ -72,17 +60,11 @@ router.post("/addNewPrescription", async (req, res) => {
           item.medicine
         )}, true, ${sequelize.escape(item.description)}, ${sequelize.escape(
           item.frequency
-        )}, ${sequelize.escape(item.foodTiming)}, '${new Date()
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " ")}', '${new Date()
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " ")}')`;
+        )}, ${sequelize.escape(item.foodTiming)})`;
       })
       .join(",");
     await sequelize.query(
-      `INSERT INTO medicines (prescriptionId, medicine, isCurrent, description, frequency, foodTiming, createdAt, updatedAt) VALUES ${medicalQueries}`
+      `INSERT INTO medicines (prescriptionId, medicine, isCurrent, description, frequency, foodTiming) VALUES ${medicalQueries}`
     );
     const tomorrow = new Date(new Date());
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -91,15 +73,9 @@ router.post("/addNewPrescription", async (req, res) => {
       tomorrow.toISOString().split("T")[0] + "T" + "05:00:00" + "Z"
     );
     await sequelize.query(
-      `INSERT INTO queues (jobType, data, time, createdAt, updatedAt) VALUES ('medicine', '{"id": ${patientId}}', ${sequelize.escape(
+      `INSERT INTO queues (jobType, data, time) VALUES ('medicine', '{"id": ${patientId}}', ${sequelize.escape(
         dateTime
-      )}, '${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}', '${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}');`
+      )});`
     );
     res.status(201).send({
       msg: "Medicines created successfully!",

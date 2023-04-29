@@ -73,7 +73,7 @@ router.post(
       console.log("PASSWORD", password);
       const hash = await bcrypt.hash(password, 10);
       await sequelize.query(
-        `INSERT INTO users (email, lastName, firstName, phoneNumber, birthday, password, role, uuid, createdAt, updatedAt) VALUES (${sequelize.escape(
+        `INSERT INTO users (email, lastName, firstName, phoneNumber, birthday, password, role, uuid) VALUES (${sequelize.escape(
           email
         )}, ${sequelize.escape(lastName)}, ${sequelize.escape(
           firstName
@@ -81,13 +81,7 @@ router.post(
           birthday
         )}, ${sequelize.escape(hash)}, ${sequelize.escape(
           Roles.PATIENT
-        )}, '${uuidv4()}', '${new Date()
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " ")}', '${new Date()
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " ")}');`
+        )}, '${uuidv4()}');`
       );
 
       // const transporter = nodeMailer.createTransport({
@@ -148,7 +142,7 @@ router.post(
       const password = generateRandomPassword(8);
       const hash = await bcrypt.hash(password, 10);
       await sequelize.query(
-        `INSERT INTO users (email, firstName, lastName, phoneNumber, birthday, password, role, uuid, createdAt, updatedAt) VALUES (${sequelize.escape(
+        `INSERT INTO users (email, firstName, lastName, phoneNumber, birthday, password, role, uuid) VALUES (${sequelize.escape(
           email
         )}, "Pharmacy", ${sequelize.escape(name)}, ${sequelize.escape(
           phoneNumber
@@ -157,13 +151,7 @@ router.post(
           .slice(0, 19)
           .replace("T", " ")}', ${sequelize.escape(hash)}, ${sequelize.escape(
           Roles.PHARMACY
-        )}, '${uuidv4()}', '${new Date()
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " ")}', '${new Date()
-          .toISOString()
-          .slice(0, 19)
-          .replace("T", " ")}');`
+        )}, '${uuidv4()}');`
       );
       await updatePharmacySchema();
       return res.status(201).send({
@@ -196,7 +184,7 @@ router.post("/addDoctor", async (req, res) => {
     }
     const hash = await bcrypt.hash(password, 10);
     await sequelize.query(
-      `INSERT INTO users (email, firstName, lastName, phoneNumber, birthday, password, role, uuid, createdAt, updatedAt) VALUES (${sequelize.escape(
+      `INSERT INTO users (email, firstName, lastName, phoneNumber, birthday, password, role, uuid) VALUES (${sequelize.escape(
         email
       )}, ${sequelize.escape(firstName)}, ${sequelize.escape(
         lastName
@@ -204,13 +192,7 @@ router.post("/addDoctor", async (req, res) => {
         birthday
       )}, ${sequelize.escape(hash)}, ${sequelize.escape(
         Roles.DOCTOR
-      )}, '${uuidv4()}', '${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}', '${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}');`
+      )}, '${uuidv4()}');`
     );
     return res.status(201).send({
       msg: "The Doctor has been registered",
@@ -259,15 +241,9 @@ router.post("/login", loginLimiter, loginValidation, async (req, res) => {
     });
     const refreshToken = jwt.sign(userToken, process.env.JWT_REFRESH_TOKEN);
     await sequelize.query(
-      `INSERT into refreshTokens (userId, refreshToken, createdAt, updatedAt) VALUES (${sequelize.escape(
+      `INSERT into refreshTokens (userId, refreshToken) VALUES (${sequelize.escape(
         user.id
-      )}, ${sequelize.escape(refreshToken)}, '${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}', '${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}')`
+      )}, ${sequelize.escape(refreshToken)})`
     );
     return res.status(200).send({
       accessToken,
@@ -331,25 +307,16 @@ router.post("/forgotPassword", async (req, res) => {
         email
       )});`
     );
-    if (getUser[0].length ===0){
-      return res.status(404).send(
-        {
-          msg: "Email not found",
-        }
-      );
+    if (getUser[0].length === 0) {
+      return res.status(404).send({
+        msg: "Email not found",
+      });
     }
-    const code = Math.floor(100000 + Math.random() *900000);
-  
+    const code = Math.floor(100000 + Math.random() * 900000);
+
     await sequelize.query(
-      `INSERT INTO user_verifications (userId, code, createdAt, updatedAt ) 
-      VALUES (${sequelize.escape(getUser[0][0].id)},${sequelize.escape(code)},
-      '${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}', '${new Date()
-        .toISOString()
-        .slice(0, 19)
-        .replace("T", " ")}');`
+      `INSERT INTO user_verifications (userId, code) 
+      VALUES (${sequelize.escape(getUser[0][0].id)},${sequelize.escape(code)});`
     );
     const transporter = nodeMailer.createTransport({
       service: "outlook",
@@ -376,7 +343,7 @@ router.post("/forgotPassword", async (req, res) => {
   }
 });
 
-router.post("/resetPassword",forgetPassValidation, async (req, res) => {
+router.post("/resetPassword", forgetPassValidation, async (req, res) => {
   const { email, code, password, confirmPassword } = req.body;
   try {
     const getUser = await sequelize.query(
@@ -384,12 +351,10 @@ router.post("/resetPassword",forgetPassValidation, async (req, res) => {
         email
       )});`
     );
-    if (getUser[0].length ===0){
-      return res.status(404).send(
-        {
-          msg: "Email not found",
-        }
-      );
+    if (getUser[0].length === 0) {
+      return res.status(404).send({
+        msg: "Email not found",
+      });
     }
     const getVerification = await sequelize.query(
       `SELECT * FROM user_verifications WHERE userId = ${sequelize.escape(

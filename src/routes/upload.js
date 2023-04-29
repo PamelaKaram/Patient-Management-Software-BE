@@ -8,6 +8,7 @@ import multer from "multer";
 import multerS3 from "multer-s3";
 import express from "express";
 const router = express.Router();
+import sequelize from "../models/index.js";
 
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -30,8 +31,7 @@ const s3Storage = multerS3({
     cb(null, { fieldname: file.fieldname });
   },
   key: (req, file, cb) => {
-    const fileName =
-      Date.now() + "_" + file.fieldname + "_" + file.originalname;
+    const fileName = Date.now() + "_" + file.originalname;
     cb(null, fileName);
   },
 });
@@ -48,15 +48,35 @@ router.post(
   "/",
   uploadImage.single("recfile"),
   async function (req, res, next) {
+    const fileName = req.file.key;
+    const patientUUID = req.body.patientUUID;
+    await sequelize.query(
+      `INSERT INTO medical_tests (patientUUID, fileName) VALUES (${sequelize.escape(
+        patientUUID
+      )}, ${sequelize.escape(fileName)})`
+    );
     res.send("Successfully uploaded " + req.file.location + " location!");
   }
 );
 
 router.get("/list", async (req, res) => {
+  const patientUUID = req.query.patientUUID;
+  const files = await sequelize.query(
+    `SELECT * FROM medical_tests WHERE patientUUID = ${sequelize.escape(
+      patientUUID
+    )}`
+  );
   const command = new ListObjectsCommand({ Bucket: BUCKET });
   const response = await s3.send(command);
   let x = response.Contents.map((item) => item.Key);
-  res.send(x);
+  let matchingObjects = [];
+  for (let i = 0; i < files[0].length; i++) {
+    if (files[0][i].patientUUID === patientUUID) {
+      matchingObjects.push(files[0][i]);
+    }
+  }
+
+  res.send(matchingObjects);
 });
 
 router.get("/download/:filename", async (req, res) => {

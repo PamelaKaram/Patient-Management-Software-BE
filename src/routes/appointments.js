@@ -10,11 +10,11 @@ dotenv.config();
 const router = express.Router();
 
 router.post("/create", async (req, res) => {
-  const { patientId, date, time, description } = req.body;
+  const { patientUUID, date, time, description } = req.body;
   try {
     const appointment = await sequelize.query(
-      `INSERT INTO appointments (patientId, date, time, description) VALUES (${sequelize.escape(
-        patientId
+      `INSERT INTO appointments (patientUUID, date, time, description) VALUES (${sequelize.escape(
+        patientUUID
       )}, ${sequelize.escape(date)}, ${sequelize.escape(
         time
       )}, ${sequelize.escape(description)});`
@@ -24,7 +24,7 @@ router.post("/create", async (req, res) => {
     const dateTime = new Date(
       newDate.toISOString().split("T")[0] + "T" + "05:00:00" + "Z"
     );
-    const job = await sequelize.query(
+    await sequelize.query(
       `INSERT INTO queues (jobType, data, time) VALUES ('appointment', '{"id": ${
         appointment[0]
       }}', ${sequelize.escape(dateTime)});`

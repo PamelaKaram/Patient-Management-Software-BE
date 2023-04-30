@@ -7,11 +7,11 @@ dotenv.config();
 const router = express.Router();
 
 router.post("/addCondition", async (req, res) => {
-  const { patientId, condition } = req.body;
+  const { patientUUID, condition } = req.body;
   try {
     await sequelize.query(
-      `INSERT INTO conditions (patientId, description, isCurrent) VALUES (${sequelize.escape(
-        patientId
+      `INSERT INTO medical_conditions (patientUUID, description, isCurrent) VALUES (${sequelize.escape(
+        patientUUID
       )}, ${sequelize.escape(condition)}, true);`
     );
     res.status(201).send({
@@ -29,7 +29,7 @@ router.post("/removeCondition", async (req, res) => {
   const { patientId, conditionId } = req.body;
   try {
     await sequelize.query(
-      `UPDATE conditions SET isCurrent = false WHERE id = ${sequelize.escape(
+      `UPDATE medical_conditions SET isCurrent = false WHERE id = ${sequelize.escape(
         conditionId
       )} AND patientId = ${sequelize.escape(patientId)};`
     );

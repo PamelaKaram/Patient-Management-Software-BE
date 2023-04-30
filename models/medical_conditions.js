@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
   medical_conditions.init(
     {
       patientId: DataTypes.INTEGER,
-      description: DataTypes.STRING,
+      description: DataTypes.TEXT,
       isCurrent: DataTypes.BOOLEAN,
       patientUUID: DataTypes.UUID,
     },

@@ -48,6 +48,7 @@ router.post(
   "/",
   uploadImage.single("recfile"),
   async function (req, res, next) {
+    console.log(req.file);
     const fileName = req.file.key;
     const patientUUID = req.body.patientUUID;
     await sequelize.query(

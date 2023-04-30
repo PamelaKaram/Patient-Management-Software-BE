@@ -1,5 +1,9 @@
 const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcryptjs");
+const {
+  updatePatientSchema,
+  updatePharmacySchema,
+} = require("../config/typesense");
 
 ("use strict");
 
@@ -1045,6 +1049,8 @@ module.exports = {
     );
     await queryInterface.bulkInsert("patient_questions", questions, {});
     await queryInterface.bulkInsert("medicines", medicines, {});
+    await updatePatientSchema();
+    await updatePharmacySchema();
   },
 
   async down(queryInterface, Sequelize) {

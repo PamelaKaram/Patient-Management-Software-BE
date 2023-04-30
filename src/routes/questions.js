@@ -32,7 +32,7 @@ router.post(
   authenticated,
   isAuthorized(Roles.PATIENT),
   async (req, res) => {
-    const { id, question } = req.body;
+    const { patientUUID, question } = req.body;
     if (!question) {
       return res
         .status(400)
@@ -40,8 +40,8 @@ router.post(
     }
     try {
       await sequelize.query(
-        `INSERT INTO patient_questions (patientId, question) VALUES (${sequelize.escape(
-          id
+        `INSERT INTO patient_questions (patientUUID, question) VALUES (${sequelize.escape(
+          patientUUID
         )}, ${sequelize.escape(question)})`
       );
       res.status(200).json({
@@ -54,5 +54,20 @@ router.post(
     }
   }
 );
+
+router.get("/patientQuestions", async (req, res) => {
+  try {
+    const questions = await sequelize.query(
+      `SELECT * FROM patient_questions WHERE isAnswered = false`
+    );
+    res.status(200).json({
+      questions: questions[0],
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+});
 
 export default router;

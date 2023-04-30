@@ -84,22 +84,22 @@ router.post(
         )}, '${uuidv4()}');`
       );
 
-      // const transporter = nodeMailer.createTransport({
-      //   service: "outlook",
-      //   auth: {
-      //     user: "dr email",
-      //     pass: "dr pass",
-      //   },
-      // });
+      //  const transporter = nodeMailer.createTransport({
+      //    service: "outlook",
+      //    auth: {
+      //      user: "dr email",
+      //      pass: "dr pass",
+      //    },
+      //   });
 
-      // const mailOptions = {
-      //   from: "dr email",
-      //   to: email,
-      //   subject: "Welcome to the Health Care System",
-      //   text: `Hello ${firstName} ${lastName},\n\nYou have been registered to the Health Care System.\n\n
-      //   Your email is: ${email}\n\n
-      //   Your password is: ${password}\n\nPlease change your password after logging in.\n\nBest regards,\nHealth Care System`,
-      // };
+      //  const mailOptions = {
+      //    from: "dr email",
+      //    to: email,
+      //    subject: "Welcome to the Health Care System",
+      //    text: `Hello ${firstName} ${lastName},\n\nYou have been registered to the Health Care System.\n\n
+      //    Your email is: ${email}\n\n
+      //    Your password is: ${password}\n\nPlease change your password after logging in.\n\nBest regards,\nHealth Care System`,
+      //  };
 
       // await transporter.sendMail(mailOptions);
       await updatePatientSchema();
@@ -303,11 +303,12 @@ router.post("/forgotPassword", async (req, res) => {
   const { email } = req.body;
   try {
     const getUser = await sequelize.query(
-      `SELECT * FROM users WHERE LOWER(email) = LOWER(${sequelize.escape(
-        email
-      )});`
+      `SELECT *
+      FROM users 
+      WHERE LOWER(email) = LOWER(${sequelize.escape(email)});`
     );
-    if (getUser[0].length === 0) {
+    const user =getUser[0][0];
+    if (user.length=== 0) {
       return res.status(404).send({
         msg: "Email not found",
       });
@@ -315,8 +316,8 @@ router.post("/forgotPassword", async (req, res) => {
     const code = Math.floor(100000 + Math.random() * 900000);
 
     await sequelize.query(
-      `INSERT INTO user_verifications (userId, code) 
-      VALUES (${sequelize.escape(getUser[0][0].id)},${sequelize.escape(code)});`
+      `INSERT INTO user_verifications (userUUId, code) 
+      VALUES (${sequelize.escape(user.uuid)},${sequelize.escape(code)});`
     );
     const transporter = nodeMailer.createTransport({
       service: "outlook",
@@ -347,18 +348,21 @@ router.post("/resetPassword", forgetPassValidation, async (req, res) => {
   const { email, code, password, confirmPassword } = req.body;
   try {
     const getUser = await sequelize.query(
-      `SELECT * FROM users WHERE LOWER(email) = LOWER(${sequelize.escape(
+      `SELECT uuid FROM users WHERE LOWER(email) = LOWER(${sequelize.escape(
         email
       )});`
     );
-    if (getUser[0].length === 0) {
+    const user = getUser[0][0];
+    if (user.length === 0) {
       return res.status(404).send({
         msg: "Email not found",
       });
     }
     const getVerification = await sequelize.query(
-      `SELECT * FROM user_verifications WHERE userId = ${sequelize.escape(
-        getUser[0][0].id
+      `SELECT * 
+      FROM user_verifications 
+      WHERE userUUId = ${sequelize.escape(
+        user.uuid
       )} AND code = ${sequelize.escape(code)};`
     );
     if (getVerification[0].length === 0) {
@@ -375,11 +379,11 @@ router.post("/resetPassword", forgetPassValidation, async (req, res) => {
     await sequelize.query(
       `UPDATE users SET password = ${sequelize.escape(
         hashedPassword
-      )} WHERE id = ${sequelize.escape(getUser[0][0].id)};`
+      )} WHERE uuid = ${sequelize.escape(user.uuid)};`
     );
     await sequelize.query(
-      `DELETE FROM user_verifications WHERE userId = ${sequelize.escape(
-        getUser[0][0].id
+      `DELETE FROM user_verifications WHERE userUUId = ${sequelize.escape(
+        user.uuid
       )}`
     );
     return res.status(200).send({

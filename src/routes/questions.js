@@ -44,10 +44,18 @@ router.post(
         .json({ msg: "Question is empty, please enter it" });
     }
     try {
+
+      const [id] = await sequelize.query(
+        `SELECT id 
+        FROM users 
+        WHERE uuid = ${sequelize.escape(patientUUID)}`
+      );
+      if (id[0].length === 0) {
+        return res.status(400).json({ msg: "Patient does not exist" });
+      }
+
       await sequelize.query(
-        `INSERT INTO patient_questions (patientUUID, question) VALUES (${sequelize.escape(
-          patientUUID
-        )}, ${sequelize.escape(question)})`
+        `INSERT INTO patient_questions (isAnswered, patientId, patientUUId, question) VALUES (0 ,${sequelize.escape(id[0].id)}, ${sequelize.escape(patientUUID)}, ${sequelize.escape(question)});`
       );
       res.status(200).json({
         message: "Question added successfully",

@@ -82,7 +82,7 @@ router.get(
   authenticated,
   isAuthorized([Roles.PATIENT, Roles.DOCTOR]),
   async (req, res) => {
-    const { id, fromDate, tillDate } = req.query;
+    const { uuid, fromDate, tillDate } = req.query;
     const fromDateString = new Date(fromDate);
     const tillDateString = new Date(tillDate);
 
@@ -90,8 +90,8 @@ router.get(
       const [past_appointments] = await sequelize.query(
         `SELECT DISTINCT appointments.*  
         FROM appointments, users 
-        WHERE appointments.patientId = users.id AND users.id= ${sequelize.escape(
-          id
+        WHERE appointments.patientUUId = users.uuid AND users.uuid= ${sequelize.escape(
+          uuid
         )} AND appointments.date BETWEEN ${sequelize.escape(
           fromDateString
         )} AND ${sequelize.escape(tillDateString)}`

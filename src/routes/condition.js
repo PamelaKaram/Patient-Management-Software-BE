@@ -57,12 +57,41 @@ router.get(
   authenticated,
   isAuthorized([Roles.PHARMACY]),
   async (req, res) => {
-    const { patientId } = req.query;
+    const { patientUUId } = req.query;
     try {
       const [conditions] = await sequelize.query(
         `SELECT * 
          FROM medical_conditions
-         WHERE patientId = ${sequelize.escape(patientId)} AND isCurrent = true;`
+         WHERE patientUUId = ${sequelize.escape(
+          patientUUId
+        )} AND isCurrent = true;`
+      );
+      res.status(201).send({
+        msg: "Conditions fetched successfully!",
+        conditions,
+      });
+    } catch (err) {
+      res.status(500).send({
+        msg: "Error fetching conditions!",
+        err: err.message,
+      });
+    }
+  }
+);
+
+router.get(
+  "/doctorGetCondition/",
+  authenticated,
+  isAuthorized(Roles.DOCTOR),
+  async (req, res) => {
+    const { patientUUId } = req.query;
+    try {
+      const [conditions] = await sequelize.query(
+        `SELECT * 
+         FROM medical_conditions
+         WHERE patientUUId = ${sequelize.escape(
+          patientUUId
+        )} AND isCurrent = true;`
       );
       res.status(201).send({
         msg: "Conditions fetched successfully!",

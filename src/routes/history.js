@@ -10,31 +10,30 @@ dotenv.config();
 const router = express.Router();
 
 router.get(
-    "/getHistory",
-    authenticated,
-    isAuthorized([Roles.Patient, Roles.Doctor]),
-    async (req, res) => {
-        const { patientId } = req.query;
-        try {
-            const history = await sequelize.query(
-                `SELECT medical_histories.* 
+  "/getHistory",
+  authenticated,
+  isAuthorized([Roles.PATIENT, Roles.DOCTOR]),
+  async (req, res) => {
+    const { patientId } = req.query;
+    try {
+      const history = await sequelize.query(
+        `SELECT medical_histories.* 
                 FROM medical_histories, users 
                 WHERE medical_histories.patientId = users.uuid AND medical_histories.patientId = ${sequelize.escape(
-                    patientId
+                  patientId
                 )};`
-            );
-            res.status(200).send({
-                msg: "History retrieved successfully!",
-                history,
-            });
-        } catch (err) {
-            res.status(500).send({
-                msg: "Error retrieving history!",
-                err: err.message,
-            });
-        }
+      );
+      res.status(200).send({
+        msg: "History retrieved successfully!",
+        history,
+      });
+    } catch (err) {
+      res.status(500).send({
+        msg: "Error retrieving history!",
+        err: err.message,
+      });
     }
+  }
 );
-
 
 export default router;

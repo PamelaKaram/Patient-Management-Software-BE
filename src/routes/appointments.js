@@ -9,43 +9,48 @@ dotenv.config();
 
 const router = express.Router();
 
-router.post("/create", async (req, res) => {
-  const { patientUUID, date, time, description } = req.body;
-  try {
-    const appointment = await sequelize.query(
-      `INSERT INTO appointments (patientUUID, date, time, description) VALUES (${sequelize.escape(
-        patientUUID
-      )}, ${sequelize.escape(date)}, ${sequelize.escape(
-        time
-      )}, ${sequelize.escape(description)});`
-    );
-    const newDate = new Date(date); // change date to before one day, continue testing
-    newDate.setDate(newDate.getDate() - 1);
-    const dateTime = new Date(
-      newDate.toISOString().split("T")[0] + "T" + "05:00:00" + "Z"
-    );
-    await sequelize.query(
-      `INSERT INTO queues (jobType, data, time) VALUES ('appointment', '{"id": ${
-        appointment[0]
-      }}', ${sequelize.escape(dateTime)});`
-    );
+router.post(
+  "/create",
+  authenticated,
+  isAuthorized([Roles.DOCTOR, Roles.DOCTOR]),
+  async (req, res) => {
+    const { patientUUID, date, time, description } = req.body;
+    try {
+      const appointment = await sequelize.query(
+        `INSERT INTO appointments (patientUUID, date, time, description) VALUES (${sequelize.escape(
+          patientUUID
+        )}, ${sequelize.escape(date)}, ${sequelize.escape(
+          time
+        )}, ${sequelize.escape(description)});`
+      );
+      const newDate = new Date(date); // change date to before one day, continue testing
+      newDate.setDate(newDate.getDate() - 1);
+      const dateTime = new Date(
+        newDate.toISOString().split("T")[0] + "T" + "05:00:00" + "Z"
+      );
+      await sequelize.query(
+        `INSERT INTO queues (jobType, data, time) VALUES ('appointment', '{"id": ${
+          appointment[0]
+        }}', ${sequelize.escape(dateTime)});`
+      );
 
-    res.status(201).send({
-      msg: "Appointment created successfully!",
-      appointment,
-    });
-  } catch (err) {
-    res.status(500).send({
-      msg: "Error creating appointment!",
-      err: err.message,
-    });
+      res.status(201).send({
+        msg: "Appointment created successfully!",
+        appointment,
+      });
+    } catch (err) {
+      res.status(500).send({
+        msg: "Error creating appointment!",
+        err: err.message,
+      });
+    }
   }
-});
+);
 
 router.get(
   "/getPastFuture",
   authenticated,
-  isAuthorized(Roles.DOCTOR),
+  isAuthorized([Roles.DOCTOR, Roles.DOCTOR]),
   async (req, res) => {
     const { fromDate, tillDate } = req.query;
     const fromDateString = new Date(fromDate);
@@ -75,7 +80,7 @@ router.get(
 router.get(
   "/patientGetPastFuture",
   authenticated,
-  isAuthorized(Roles.PATIENT),
+  isAuthorized([Roles.PATIENT, Roles.DOCTOR]),
   async (req, res) => {
     const { id, fromDate, tillDate } = req.query;
     const fromDateString = new Date(fromDate);
@@ -107,7 +112,7 @@ router.get(
 router.get(
   "/getAvailability",
   authenticated,
-  isAuthorized(Roles.DOCTOR),
+  isAuthorized([Roles.DOCTOR, Roles.DOCTOR]),
   async (req, res) => {
     try {
       const today = new Date();

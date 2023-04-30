@@ -1,7 +1,7 @@
 const isAuthorized = (role) => {
   return (req, res, next) => {
     console.log(req.user);
-    if (req.user.role !== role) {
+    if (!role.includes(req.user.role)) {
       res.status(401);
       return res.send("Not allowed");
     }

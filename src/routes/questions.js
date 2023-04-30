@@ -9,28 +9,33 @@ dotenv.config();
 
 const router = express.Router();
 
-router.post("/answer", async (req, res) => {
-  const { questionId, answer } = req.body;
-  try {
-    await sequelize.query(
-      `UPDATE patient_questions SET answer = '${sequelize.escape(
-        answer
-      )}' WHERE id = ${sequelize.escape(questionId)}`
-    );
-    res.status(200).json({
-      message: "Answered successfully",
-    });
-  } catch (err) {
-    res.status(500).json({
-      message: "Internal Server Error",
-    });
+router.post(
+  "/answer",
+  authenticated,
+  isAuthorized([Roles.DOCTOR]),
+  async (req, res) => {
+    const { questionId, answer } = req.body;
+    try {
+      await sequelize.query(
+        `UPDATE patient_questions SET answer = '${sequelize.escape(
+          answer
+        )}' WHERE id = ${sequelize.escape(questionId)}`
+      );
+      res.status(200).json({
+        message: "Answered successfully",
+      });
+    } catch (err) {
+      res.status(500).json({
+        message: "Internal Server Error",
+      });
+    }
   }
-});
+);
 
 router.post(
   "/patientQuestion",
   authenticated,
-  isAuthorized(Roles.PATIENT),
+  isAuthorized([Roles.PATIENT]),
   async (req, res) => {
     const { patientUUID, question } = req.body;
     if (!question) {

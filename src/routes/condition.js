@@ -9,24 +9,29 @@ dotenv.config();
 
 const router = express.Router();
 
-router.post("/addCondition", async (req, res) => {
-  const { patientUUID, condition } = req.body;
-  try {
-    await sequelize.query(
-      `INSERT INTO medical_conditions (patientUUID, description, isCurrent) VALUES (${sequelize.escape(
-        patientUUID
-      )}, ${sequelize.escape(condition)}, true);`
-    );
-    res.status(201).send({
-      msg: "Condition created successfully!",
-    });
-  } catch (err) {
-    res.status(500).send({
-      msg: "Error creating condition!",
-      err: err.message,
-    });
+router.post(
+  "/addCondition",
+  authenticated,
+  isAuthorized([Roles.DOCTOR]),
+  async (req, res) => {
+    const { patientUUID, condition } = req.body;
+    try {
+      await sequelize.query(
+        `INSERT INTO medical_conditions (patientUUID, description, isCurrent) VALUES (${sequelize.escape(
+          patientUUID
+        )}, ${sequelize.escape(condition)}, true);`
+      );
+      res.status(201).send({
+        msg: "Condition created successfully!",
+      });
+    } catch (err) {
+      res.status(500).send({
+        msg: "Error creating condition!",
+        err: err.message,
+      });
+    }
   }
-});
+);
 
 router.post("/removeCondition", async (req, res) => {
   const { patientId, conditionId } = req.body;
@@ -50,16 +55,14 @@ router.post("/removeCondition", async (req, res) => {
 router.get(
   "/pharmacyGetCondition/",
   authenticated,
-  isAuthorized(Roles.PHARMACY),
+  isAuthorized([Roles.PHARMACY]),
   async (req, res) => {
     const { patientId } = req.query;
     try {
       const [conditions] = await sequelize.query(
         `SELECT * 
          FROM medical_conditions
-         WHERE patientId = ${sequelize.escape(
-          patientId
-        )} AND isCurrent = true;`
+         WHERE patientId = ${sequelize.escape(patientId)} AND isCurrent = true;`
       );
       res.status(201).send({
         msg: "Conditions fetched successfully!",

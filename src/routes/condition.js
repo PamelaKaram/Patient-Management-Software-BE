@@ -1,5 +1,8 @@
 import express from "express";
 import sequelize from "../models/index.js";
+import authenticated from "../middlewares/authentication.js";
+import isAuthorized from "../middlewares/authorization.js";
+import Roles from "../enums/roles.js";
 
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -43,5 +46,32 @@ router.post("/removeCondition", async (req, res) => {
     });
   }
 });
+
+router.get(
+  "/pharmacyGetCondition/",
+  authenticated,
+  isAuthorized(Roles.PHARMACY),
+  async (req, res) => {
+    const { patientId } = req.query;
+    try {
+      const [conditions] = await sequelize.query(
+        `SELECT * 
+         FROM medical_conditions
+         WHERE patientId = ${sequelize.escape(
+          patientId
+        )} AND isCurrent = true;`
+      );
+      res.status(201).send({
+        msg: "Conditions fetched successfully!",
+        conditions,
+      });
+    } catch (err) {
+      res.status(500).send({
+        msg: "Error fetching conditions!",
+        err: err.message,
+      });
+    }
+  }
+);
 
 export default router;

@@ -10,6 +10,7 @@ import questions from "./routes/questions.js";
 import access from "./routes/pharmacyAccess.js";
 import info from "./routes/info.js";
 import rateLimit from "express-rate-limit";
+import history from "./routes/history.js";
 
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -48,6 +49,8 @@ app.use("/api/v1/condition", condition);
 app.use("/api/v1/questions", questions);
 app.use("/api/v1/access", access);
 app.use("/api/v1/info", info);
+app.use("/api/v1/history", history);
+
 
 app.use((err, res) => {
   err.statusCode = err.statusCode || 500;

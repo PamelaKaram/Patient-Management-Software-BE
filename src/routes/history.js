@@ -12,16 +12,14 @@ const router = express.Router();
 router.get(
     "/getHistory",
     authenticated,
-    isAuthorized([Roles.Patient, Roles.Doctor]),
+    isAuthorized(Roles.DOCTOR),
     async (req, res) => {
-        const { patientId } = req.query;
+        const { patientUUId } = req.query;
         try {
-            const history = await sequelize.query(
-                `SELECT medical_histories.* 
-                FROM medical_histories, users 
-                WHERE medical_histories.patientId = users.uuid AND medical_histories.patientId = ${sequelize.escape(
-                    patientId
-                )};`
+            const [history] = await sequelize.query(
+                `SELECT * 
+                FROM medical_histories
+                WHERE medical_histories.patientUUId = ${sequelize.escape(patientUUId)};`
             );
             res.status(200).send({
                 msg: "History retrieved successfully!",

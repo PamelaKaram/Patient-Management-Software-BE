@@ -32,17 +32,26 @@ router.post(
   authenticated,
   isAuthorized(Roles.PATIENT),
   async (req, res) => {
-    const { id, question } = req.body;
+    const { patientUUID, question } = req.body;
     if (!question) {
       return res
         .status(400)
         .json({ msg: "Question is empty, please enter it" });
     }
     try {
+
+      const [id] = await sequelize.query(
+        `SELECT id 
+        FROM users 
+        WHERE uuid = ${sequelize.escape(patientUUID)}`
+      );
+      console.log(id[0].id)
+      if (id[0].length === 0) {
+        return res.status(400).json({ msg: "Patient does not exist" });
+      }
+
       await sequelize.query(
-        `INSERT INTO patient_questions (patientId, question) VALUES (${sequelize.escape(
-          id
-        )}, ${sequelize.escape(question)})`
+        `INSERT INTO patient_questions (isAnswered, patientId, patientUUId, question) VALUES (0 ,${sequelize.escape(id[0].id)}, ${sequelize.escape(patientUUID)}, ${sequelize.escape(question)});`
       );
       res.status(200).json({
         message: "Question added successfully",

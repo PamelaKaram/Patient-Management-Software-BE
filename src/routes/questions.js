@@ -45,7 +45,6 @@ router.post(
         FROM users 
         WHERE uuid = ${sequelize.escape(patientUUID)}`
       );
-      console.log(id[0].id)
       if (id[0].length === 0) {
         return res.status(400).json({ msg: "Patient does not exist" });
       }

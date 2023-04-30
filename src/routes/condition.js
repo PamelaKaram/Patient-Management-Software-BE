@@ -84,7 +84,7 @@ router.get(
       const [conditions] = await sequelize.query(
         `SELECT * 
          FROM medical_conditions
-         WHERE patientId = ${sequelize.escape(
+         WHERE patientUUId = ${sequelize.escape(
           patientUUId
         )} AND isCurrent = true;`
       );

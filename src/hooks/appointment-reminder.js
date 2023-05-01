@@ -13,7 +13,7 @@ export default async function getNextAppointmentReminder() {
       firstName: patient[0][0].firstName,
       lastName: patient[0][0].lastName,
       email: patient[0][0].email,
-      medicines: medicines,
+      appointment: appointments,
     });
 
     item = await getNext("appointmentReminder");

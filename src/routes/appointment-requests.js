@@ -11,15 +11,15 @@ dotenv.config();
 const router = express.Router();
 
 router.post("/", async (req, res) => {
-  const { firstName, lastName, email, phoneNumber, date } = req.body;
+  const { firstName, lastName, email, phoneNumber, message } = req.body;
   try {
     const appointment = await sequelize.query(
-      `INSERT INTO appointment_requests (firstName, lastName, email, phoneNumber, date, isResponded, appointmentUUID) VALUES (${sequelize.escape(
+      `INSERT INTO appointment_requests (firstName, lastName, email, phoneNumber, message, isResponded, appointmentUUID) VALUES (${sequelize.escape(
         firstName
       )}, ${sequelize.escape(lastName)}, ${sequelize.escape(
         email
       )}, ${sequelize.escape(phoneNumber)}, ${sequelize.escape(
-        date
+        message
       )}, false, ${uuidv4()});`
     );
     res.status(201).send({

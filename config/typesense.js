@@ -24,6 +24,16 @@ export const patientsSchema = {
   ],
 };
 
+export const patientsAccessSchema = {
+  name: "patients_access",
+  fields: [
+    { name: "firstName", type: "string" },
+    { name: "lastName", type: "string" },
+    { name: "uuid", type: "string" },
+    { name: "pharmacyUUIDs", type: "string[]" },
+  ],
+};
+
 export const pharmaciesSchema = {
   name: "pharmacies",
   fields: [
@@ -106,5 +116,50 @@ export async function updatePharmacySchema() {
       );
 }
 
+export async function updatePatientAccessSchema() {
+  try {
+    await client.collections("patients_access").delete();
+    console.log("Deleting existing collection: patients_access");
+  } catch (e) {
+    console.log("On deleting patients: ", e);
+  }
+
+  client
+    .collections()
+    .create(patientsAccessSchema)
+    .then(function (data) {
+      console.log(data);
+    });
+
+  let patientsData;
+  //convert to JSON to be able to import to typesense
+  try {
+    const patientsData = await sequelize.query(
+      `SELECT JSON_ARRAYAGG(
+        JSON_OBJECT('firstName', u.firstName, 'lastName', u.lastName, 'uuid', u.uuid, 'pharmacyUUIDs', (SELECT JSON_ARRAYAGG(pa.pharmacyUUID) FROM pharmacy_accesses pa WHERE pa.patientUUID = u.uuid))
+    )
+FROM users u 
+WHERE u.role = 'patient';`
+    );
+    console.log(
+      patientsData[0][0][
+        "JSON_ARRAYAGG(\n        JSON_OBJECT('firstName', u.firstName, 'lastName', u.lastName, 'uuid', u.uuid, 'pharmacyUUIDs', (SELECT JSON_ARRAYAGG(pa.pharmacyUUID) FROM pharmacy_accesses pa WHERE pa.patientUUID = u.uuid))\n    )"
+      ]
+    );
+  } catch (e) {
+    console.log(e);
+  }
+  if (patientsData)
+    client
+      .collections("patients_access")
+      .documents()
+      .import(
+        patientsData[0][0][
+          "JSON_ARRAYAGG(\n        JSON_OBJECT('firstName', u.firstName, 'lastName', u.lastName, 'uuid', u.uuid, 'pharmacyUUIDs', (SELECT JSON_ARRAYAGG(pa.pharmacyUUID) FROM pharmacy_accesses pa WHERE pa.patientUUID = u.uuid))\n    )"
+        ]
+      );
+}
+
 updatePatientSchema();
 updatePharmacySchema();
+updatePatientAccessSchema();

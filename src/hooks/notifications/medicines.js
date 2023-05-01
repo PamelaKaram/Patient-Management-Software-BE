@@ -13,11 +13,15 @@ export default async function sendMedicineNotification({
     .join("\n");
 
   const mailOptions = {
-    from: "email",
+    from: "drwalidpatientsoftware@outlook.com",
     to: email,
     subject: "Medicine Reminder",
     text: `Hello ${firstName} ${lastName},\n\n Don't forget to take your medicine in the following manner:\n\n ${medicineText}`,
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (err) {
+    console.log(err);
+  }
 }

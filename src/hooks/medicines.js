@@ -1,5 +1,4 @@
 import sequelize from "../models/index.js";
-import transporter from "./notifications/index.js";
 import sendMedicineNotification from "./notifications/medicines.js";
 import getNext from "./queue.js";
 

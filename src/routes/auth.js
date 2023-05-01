@@ -87,13 +87,13 @@ router.post(
       //  const transporter = nodeMailer.createTransport({
       //    service: "outlook",
       //    auth: {
-      //      user: "dr email",
-      //      pass: "dr pass",
+      //      user: "drwalidpatientsoftware@outlook.com",
+      //      pass: "PatientSoftware",
       //    },
       //   });
 
       //  const mailOptions = {
-      //    from: "dr email",
+      //    from: "drwalidpatientsoftware@outlook.com",
       //    to: email,
       //    subject: "Welcome to the Health Care System",
       //    text: `Hello ${firstName} ${lastName},\n\nYou have been registered to the Health Care System.\n\n
@@ -101,7 +101,11 @@ router.post(
       //    Your password is: ${password}\n\nPlease change your password after logging in.\n\nBest regards,\nHealth Care System`,
       //  };
 
-      // await transporter.sendMail(mailOptions);
+      // try {
+      //   await transporter.sendMail(mailOptions);
+      // } catch (err) {
+      //   console.log(err);
+      // }
       await updatePatientSchema();
       return res.status(201).send({
         msg: "The user has been registered",
@@ -307,8 +311,8 @@ router.post("/forgotPassword", async (req, res) => {
       FROM users 
       WHERE LOWER(email) = LOWER(${sequelize.escape(email)});`
     );
-    const user =getUser[0][0];
-    if (user.length=== 0) {
+    const user = getUser[0][0];
+    if (user.length === 0) {
       return res.status(404).send({
         msg: "Email not found",
       });
@@ -322,17 +326,21 @@ router.post("/forgotPassword", async (req, res) => {
     const transporter = nodeMailer.createTransport({
       service: "outlook",
       auth: {
-        user: "dr email",
-        pass: "dr pass",
+        user: "drwalidpatientsoftware@outlook.com",
+        pass: "PatientSoftware",
       },
     });
     const mailOptions = {
-      from: "dr email",
+      from: "drwalidpatientsoftware@outlook.com",
       to: email,
       subject: "Reset Password",
       text: `Your reset code is ${code}`,
     };
-    await transporter.sendMail(mailOptions);
+    try {
+      await transporter.sendMail(mailOptions);
+    } catch (e) {
+      console.log(e);
+    }
     return res.status(200).send({
       msg: "Email sent",
     });

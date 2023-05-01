@@ -13,6 +13,8 @@ import rateLimit from "express-rate-limit";
 import history from "./routes/history.js";
 
 import * as dotenv from "dotenv";
+import sendWeeklyNotification from "./hooks/weekly-notifications.js";
+import sendDailyNotification from "./hooks/daily-notifications.js";
 dotenv.config();
 
 const port = process.env.PORT;
@@ -50,7 +52,6 @@ app.use("/api/v1/questions", questions);
 app.use("/api/v1/access", access);
 app.use("/api/v1/info", info);
 app.use("/api/v1/history", history);
-
 
 app.use((err, res) => {
   err.statusCode = err.statusCode || 500;

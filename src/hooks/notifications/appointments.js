@@ -16,11 +16,15 @@ export default async function sendAppointmentNotification({
   }
 
   const mailOptions = {
-    from: "email",
+    from: "drwalidpatientsoftware@outlook.com",
     to: email,
     subject: "Appointment Reminder",
     text: text,
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (err) {
+    console.log(err);
+  }
 }

@@ -1,9 +1,9 @@
 const { v4: uuidv4 } = require("uuid");
 const bcrypt = require("bcryptjs");
-const {
-  updatePatientSchema,
-  updatePharmacySchema,
-} = require("../config/typesense");
+// const {
+//   updatePatientSchema,
+//   updatePharmacySchema,
+// } = require("../config/typesense");
 
 ("use strict");
 
@@ -181,6 +181,48 @@ module.exports = {
         phoneNumber: "12345678",
         role: "pharmacy",
         uuid: uuidv4(),
+      },
+    ];
+    const pharmacy_accesses = [
+      {
+        hasAccess: true,
+        pharmacyUUID: usersArray[15].uuid,
+        patientUUID: usersArray[0].uuid,
+      },
+      {
+        hasAccess: true,
+        pharmacyUUID: usersArray[16].uuid,
+        patientUUID: usersArray[0].uuid,
+      },
+      {
+        hasAccess: true,
+        pharmacyUUID: usersArray[14].uuid,
+        patientUUID: usersArray[0].uuid,
+      },
+      {
+        hasAccess: true,
+        pharmacyUUID: usersArray[15].uuid,
+        patientUUID: usersArray[1].uuid,
+      },
+      {
+        hasAccess: true,
+        pharmacyUUID: usersArray[16].uuid,
+        patientUUID: usersArray[2].uuid,
+      },
+      {
+        hasAccess: true,
+        pharmacyUUID: usersArray[14].uuid,
+        patientUUID: usersArray[3].uuid,
+      },
+      {
+        hasAccess: true,
+        pharmacyUUID: usersArray[15].uuid,
+        patientUUID: usersArray[4].uuid,
+      },
+      {
+        hasAccess: true,
+        pharmacyUUID: usersArray[16].uuid,
+        patientUUID: usersArray[4].uuid,
       },
     ];
     const appointmentsArray = [
@@ -1049,8 +1091,9 @@ module.exports = {
     );
     await queryInterface.bulkInsert("patient_questions", questions, {});
     await queryInterface.bulkInsert("medicines", medicines, {});
-    await updatePatientSchema();
-    await updatePharmacySchema();
+    await queryInterface.bulkInsert("pharmacy_accesses", pharmacy_accesses, {});
+    // await updatePatientSchema();
+    // await updatePharmacySchema();
   },
 
   async down(queryInterface, Sequelize) {

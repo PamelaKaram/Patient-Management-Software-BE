@@ -14,12 +14,12 @@ router.post(
   authenticated,
   isAuthorized([Roles.DOCTOR]),
   async (req, res) => {
-    const { pharmacyId, patientId } = req.body;
+    const { pharmacyUUID, patientUUID } = req.body;
     try {
       await sequelize.query(
-        `INSERT INTO pharmacy_accesses (pharmacyId, patientId, hasAccess) VALUES (${sequelize.escape(
-          pharmacyId
-        )}, ${sequelize.escape(patientId)}, true)`
+        `INSERT INTO pharmacy_accesses (pharmacyUUID, patientUUID, hasAccess) VALUES (${sequelize.escape(
+          pharmacyUUID
+        )}, ${sequelize.escape(patientUUID)}, true)`
       );
       res.status(200).json({
         message: "Access given successfully",
@@ -33,12 +33,14 @@ router.post(
 );
 
 router.get("/hasAccess", async (req, res) => {
-  const { pharmacyId, patientId } = req.body;
+  const { pharmacyUUID, patientUUID } = req.body;
   try {
     const result = await sequelize.query(
-      `SELECT * FROM pharmacy_accesses WHERE pharmacyId = ${sequelize.escape(
-        pharmacyId
-      )} AND patientId = ${sequelize.escape(patientId)} AND hasAccess = true;`
+      `SELECT * FROM pharmacy_accesses WHERE pharmacyUUID = ${sequelize.escape(
+        pharmacyUUID
+      )} AND patientUUID = ${sequelize.escape(
+        patientUUID
+      )} AND hasAccess = true;`
     );
     if (result[0][0].hasAccess) {
       res.status(200).json({
@@ -61,12 +63,12 @@ router.post(
   authenticated,
   isAuthorized([Roles.DOCTOR]),
   async (req, res) => {
-    const { pharmacyId, patientId } = req.body;
+    const { pharmacyUUID, patientUUID } = req.body;
     try {
       await sequelize.query(
-        `UPDATE pharmacy_accesses SET hasAccess = false WHERE pharmacyId = ${sequelize.escape(
-          pharmacyId
-        )} AND patientId = ${sequelize.escape(patientId)};`
+        `UPDATE pharmacy_accesses SET hasAccess = false WHERE pharmacyUUID = ${sequelize.escape(
+          pharmacyUUID
+        )} AND patientUUID = ${sequelize.escape(patientUUID)};`
       );
       res.status(200).json({
         message: "Access removed successfully",

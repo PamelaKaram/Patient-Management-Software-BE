@@ -12,7 +12,7 @@ const router = express.Router();
 router.get(
   "/patient",
   authenticated,
-  isAuthorized([Roles.DOCTOR]),
+  isAuthorized([Roles.DOCTOR, Roles.PATIENT]),
   async (req, res) => {
     const { patientUUID } = req.query;
     console.log(req.query);
@@ -38,10 +38,9 @@ router.get(
   authenticated,
   isAuthorized([Roles.DOCTOR]),
   async (req, res) => {
-    const { doctorUUID } = req.query;
     try {
       const data = await sequelize.query(
-        `SELECT * FROM users WHERE uuid = ${sequelize.escape(doctorUUID)};`
+        `SELECT * FROM users WHERE role="doctor";`
       );
       res.status(201).json({
         data: data[0][0],

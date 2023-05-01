@@ -84,28 +84,28 @@ router.post(
         )}, '${uuidv4()}');`
       );
 
-      //  const transporter = nodeMailer.createTransport({
-      //    service: "outlook",
-      //    auth: {
-      //      user: "drwalidpatientsoftware@outlook.com",
-      //      pass: "PatientSoftware",
-      //    },
-      //   });
+      const transporter = nodeMailer.createTransport({
+        service: "outlook",
+        auth: {
+          user: "drwalidpatientsoftware@outlook.com",
+          pass: "PatientSoftware",
+        },
+      });
 
-      //  const mailOptions = {
-      //    from: "drwalidpatientsoftware@outlook.com",
-      //    to: email,
-      //    subject: "Welcome to the Health Care System",
-      //    text: `Hello ${firstName} ${lastName},\n\nYou have been registered to the Health Care System.\n\n
-      //    Your email is: ${email}\n\n
-      //    Your password is: ${password}\n\nPlease change your password after logging in.\n\nBest regards,\nHealth Care System`,
-      //  };
+      const mailOptions = {
+        from: "drwalidpatientsoftware@outlook.com",
+        to: email,
+        subject: "Welcome to the Health Care System",
+        text: `Hello ${firstName} ${lastName},\n\nYou have been registered to the Health Care System.\n\n
+         Your email is: ${email}\n\n
+         Your password is: ${password}\n\nPlease change your password after logging in.\n\nBest regards,\nHealth Care System`,
+      };
 
-      // try {
-      //   await transporter.sendMail(mailOptions);
-      // } catch (err) {
-      //   console.log(err);
-      // }
+      try {
+        await transporter.sendMail(mailOptions);
+      } catch (err) {
+        console.log(err);
+      }
       await updatePatientSchema();
       return res.status(201).send({
         msg: "The user has been registered",
@@ -157,6 +157,28 @@ router.post(
           Roles.PHARMACY
         )}, '${uuidv4()}');`
       );
+      const transporter = nodeMailer.createTransport({
+        service: "outlook",
+        auth: {
+          user: "drwalidpatientsoftware@outlook.com",
+          pass: "PatientSoftware",
+        },
+      });
+
+      const mailOptions = {
+        from: "drwalidpatientsoftware@outlook.com",
+        to: email,
+        subject: "Welcome to the Health Care System",
+        text: `Hello ${firstName} ${lastName},\n\nYou have been registered to the Health Care System.\n\n
+         Your email is: ${email}\n\n
+         Your password is: ${password}\n\nPlease change your password after logging in.\n\nBest regards,\nHealth Care System`,
+      };
+
+      try {
+        await transporter.sendMail(mailOptions);
+      } catch (err) {
+        console.log(err);
+      }
       await updatePharmacySchema();
       return res.status(201).send({
         msg: "The pharmacy has been registered",

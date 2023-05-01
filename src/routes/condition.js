@@ -34,12 +34,12 @@ router.post(
 );
 
 router.post("/removeCondition", async (req, res) => {
-  const { patientId, conditionId } = req.body;
+  const { patientUUID, conditionId } = req.body;
   try {
     await sequelize.query(
       `UPDATE medical_conditions SET isCurrent = false WHERE id = ${sequelize.escape(
         conditionId
-      )} AND patientId = ${sequelize.escape(patientId)};`
+      )} AND patientUUID = ${sequelize.escape(patientUUID)};`
     );
     res.status(201).send({
       msg: "Condition removed successfully!",
@@ -63,8 +63,8 @@ router.get(
         `SELECT * 
          FROM medical_conditions
          WHERE patientUUId = ${sequelize.escape(
-          patientUUId
-        )} AND isCurrent = true;`
+           patientUUId
+         )} AND isCurrent = true;`
       );
       res.status(201).send({
         msg: "Conditions fetched successfully!",
@@ -90,8 +90,8 @@ router.get(
         `SELECT * 
          FROM medical_conditions
          WHERE patientUUId = ${sequelize.escape(
-          patientUUId
-        )} AND isCurrent = true;`
+           patientUUId
+         )} AND isCurrent = true;`
       );
       res.status(201).send({
         msg: "Conditions fetched successfully!",

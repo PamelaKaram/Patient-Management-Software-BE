@@ -15,11 +15,11 @@ router.post(
   authenticated,
   isAuthorized([Roles.DOCTOR]),
   async (req, res) => {
-    const { patientId, medicine } = req.body;
+    const { patientUUID, medicine } = req.body;
     try {
       const medicalQueries = medicine
         .map((item) => {
-          return `(${sequelize.escape(patientId)}, ${sequelize.escape(
+          return `(${sequelize.escape(patientUUID)}, ${sequelize.escape(
             item.medicine
           )}, true, ${sequelize.escape(item.description)}, ${sequelize.escape(
             item.frequency
@@ -27,7 +27,7 @@ router.post(
         })
         .join(",");
       await sequelize.query(
-        `INSERT INTO medicines (prescriptionId, medicine, isCurrent, description, frequency, foodTiming) VALUES ${medicalQueries}`
+        `INSERT INTO medicines (patientUUID, medicine, isCurrent, description, frequency, foodTiming) VALUES ${medicalQueries}`
       );
       const tomorrow = new Date(new Date());
       tomorrow.setDate(tomorrow.getDate() + 1);
@@ -36,7 +36,7 @@ router.post(
         tomorrow.toISOString().split("T")[0] + "T" + "05:00:00" + "Z"
       );
       await sequelize.query(
-        `INSERT INTO queues (jobType, data, time) VALUES ('medicine', '{"id": ${patientId}}', ${sequelize.escape(
+        `INSERT INTO queues (jobType, data, time) VALUES ('medicine', '{"id": ${patientUUID}}', ${sequelize.escape(
           dateTime
         )});`
       );
@@ -59,11 +59,11 @@ router.post(
   authenticated,
   isAuthorized([Roles.DOCTOR]),
   async (req, res) => {
-    const { patientId, medicine } = req.body;
+    const { patientUUID, medicine } = req.body;
     try {
       await sequelize.query(
-        `UPDATE medicines SET isCurrent = false WHERE prescriptionId = ${sequelize.escape(
-          patientId
+        `UPDATE medicines SET isCurrent = false WHERE patientUUID = ${sequelize.escape(
+          patientUUID
         )} AND isCurrent = true;`
       );
       const medicalQueries = medicine
@@ -91,7 +91,6 @@ router.post(
       );
       res.status(201).send({
         msg: "Medicines created successfully!",
-        medicalQueries,
       });
     } catch (err) {
       res.status(500).send({

@@ -1,5 +1,5 @@
 import sequelize from "../models/index.js";
-import sendMedicineNotification from "./notifications/medicines.js";
+import sendAppointmentNotification from "./notifications/appointments.js";
 import getNext from "./queue.js";
 
 export default async function getNextAppointmentReminder() {
@@ -9,7 +9,7 @@ export default async function getNextAppointmentReminder() {
     const patient = await sequelize.query(
       `SELECT * FROM users WHERE uuid = ${item.data.patientUUID}`
     );
-    await sendMedicineNotification({
+    await sendAppointmentNotification({
       firstName: patient[0][0].firstName,
       lastName: patient[0][0].lastName,
       email: patient[0][0].email,

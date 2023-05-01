@@ -136,4 +136,36 @@ router.get(
   }
 );
 
+router.post(
+  "/remindToBookAppointment",
+  authenticated,
+  isAuthorized([Roles.PATIENT]),
+  async (req, res) => {
+    const { patientUUID, date } = req.body;
+    try {
+      //create job in queue to remind 1 week before date
+      const dateToRemind = new Date(new Date());
+      dateToRemind.setDate(dateToRemind.getDate() - 7);
+      // send medicine reminder at 5am
+      const dateTime = new Date(
+        dateToRemind.toISOString().split("T")[0] + "T" + "05:00:00" + "Z"
+      );
+      const job = await sequelize.query(
+        `INSERT INTO queues (jobType, data, time) VALUES ('appointmentReminder', '{"patientUUID": ${sequelize.escape(
+          patientUUID
+        )}}', ${sequelize.escape(dateTime)});`
+      );
+      res.status(201).send({
+        msg: "Appointment reminder created successfully!",
+        job,
+      });
+    } catch (err) {
+      res.status(500).send({
+        msg: "Error creating appointment reminder!",
+        err: err.message,
+      });
+    }
+  }
+);
+
 export default router;
